@@ -10,6 +10,10 @@ function preload() {
 
 }
 
+var bmd;
+var fringe;
+var fogCircle;
+
 var map;
 var layer;
 var cursors;
@@ -59,11 +63,24 @@ function create() {
     game.physics.enable(bot, Phaser.Physics.ARCADE);
     bot.body.setSize(10, 14, 2, 1);
 
+
+    fogCircle = new Phaser.Circle(800, 800, 800);
+    fringe = 64;
+    //  Create a new bitmap data the same size as our game
+    bmd = game.make.bitmapData(800, 600);
+    updateFogOfWar();
+    var fogSprite = bmd.addToWorld();
+    fogSprite.fixedToCamera = true;
+    var tween = game.add.tween(player).to({ x: 2000, y: 800 }, 15000, "Linear", true, 0, -1, true);
+    tween.onLoop.add(function (sprite, tween) {sprite.scale.x *= -1}, 0, this);
 }
 
 function update() {
 
     // game.physics.arcade.collide(player, layer);
+
+    fogCircle.x = player.x;
+    fogCircle.y = player.y;
 
     game.physics.arcade.collide(player, bot);
 
@@ -95,10 +112,31 @@ function update() {
         player.animations.stop();
     }
 
+    updateFogOfWar();
 }
 
 function render() {
 
      //game.debug.body(player);
 
+}
+
+function updateFogOfWar ()
+{
+    var gradient = bmd.context.createRadialGradient(
+        fogCircle.x - game.camera.x,
+        fogCircle.y - game.camera.y,
+        fogCircle.radius,
+        fogCircle.x - game.camera.x,
+        fogCircle.y - game.camera.y,
+        fogCircle.radius - fringe
+    );
+
+    gradient.addColorStop(0, 'rgba(0,0,0,0.8');
+    gradient.addColorStop(0.4, 'rgba(0,0,0,0.5');
+    gradient.addColorStop(1, 'rgba(0,0,0,0');
+
+    bmd.clear();
+    bmd.context.fillStyle = gradient;
+    bmd.context.fillRect(0, 0, 800, 600);
 }
