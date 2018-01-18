@@ -5,7 +5,8 @@ function preload() {
 
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
+    game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
 
 }
 
@@ -13,6 +14,7 @@ var map;
 var layer;
 var cursors;
 var player;
+var bot;
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -53,13 +55,20 @@ function create() {
     var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
     help.fixedToCamera = true;
 
+    bot = game.add.sprite(300, 300, 'bot', 1);
+    game.physics.enable(bot, Phaser.Physics.ARCADE);
+    bot.body.setSize(10, 14, 2, 1);
+
 }
 
 function update() {
 
     // game.physics.arcade.collide(player, layer);
 
+    game.physics.arcade.collide(player, bot);
+
     player.body.velocity.set(0);
+    bot.body.velocity.set(0);
 
     if (cursors.left.isDown)
     {
