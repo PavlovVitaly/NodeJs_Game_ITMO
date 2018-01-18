@@ -1,5 +1,5 @@
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
 
@@ -15,6 +15,7 @@ var cursors;
 var player;
 
 function create() {
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
     //  Because we're loading CSV map data we have to specify the tile size here or we can't render it
     map = game.add.tilemap('map', 16, 16);
@@ -28,11 +29,11 @@ function create() {
     //  Resize the world
     layer.resizeWorld();
 
-    //  This isn't totally accurate, but it'll do for now
+    // //  This isn't totally accurate, but it'll do for now
     map.setCollisionBetween(54, 83);
 
     //  Un-comment this on to see the collision tiles
-    layer.debug = true;
+    // layer.debug = true;
 
     //  Player
     player = game.add.sprite(48, 48, 'player', 1);
@@ -56,7 +57,7 @@ function create() {
 
 function update() {
 
-    game.physics.arcade.collide(player, layer);
+    // game.physics.arcade.collide(player, layer);
 
     player.body.velocity.set(0);
 
@@ -89,6 +90,6 @@ function update() {
 
 function render() {
 
-     game.debug.body(player);
+     //game.debug.body(player);
 
 }
