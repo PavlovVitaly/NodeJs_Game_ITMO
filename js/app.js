@@ -1,142 +1,163 @@
+'use strict';
 
 var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
-
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
     game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
-
+    game.load.image('bullet', 'assets/sprites/bullet.png');
 }
 
-var bmd;
-var fringe;
-var fogCircle;
+class Player{
+    constructor(curSpriteName, curGame, phaser){
+        this.spriteName = curSpriteName;
+        this.game = curGame;
+        this.phaser = phaser;
+        this.cursors = this.game.input.keyboard.createCursorKeys();
+        this.player = this.game.add.sprite(48, 48, this.spriteName, 1);
+
+        this.player.animations.add('left', [8,9], 10, true);
+        this.player.animations.add('right', [1,2], 10, true);
+        this.player.animations.add('up', [11,12,13], 10, true);
+        this.player.animations.add('down', [4,5,6], 10, true);
+
+        this.game.physics.enable(this.player, this.phaser.Physics.ARCADE);
+
+        this.player.body.setSize(10, 14, 2, 1);
+
+        this.game.camera.follow(this.player);
+    }
+
+    update(){
+        this.player.body.velocity.set(0);
+
+        if (this.cursors.left.isDown)
+        {
+            this.player.body.velocity.x = -100;
+            this.player.play('left');
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.player.body.velocity.x = 100;
+            this.player.play('right');
+        }
+        else if (this.cursors.up.isDown)
+        {
+            this.player.body.velocity.y = -100;
+            this.player.play('up');
+        }
+        else if (this.cursors.down.isDown)
+        {
+            this.player.body.velocity.y = 100;
+            this.player.play('down');
+        }
+        else
+        {
+            this.player.animations.stop();
+        }
+    }
+
+    getBody(){
+        return this.player;
+    }
+}
+
+class Bot{
+    constructor(curSpriteName, curGame, phaser){
+        this.spriteName = curSpriteName;
+        this.phaser = phaser;
+        this.game = curGame;
+        this.bot = this.game.add.sprite(300, 320, this.spriteName, 1);
+        this.game.physics.enable(this.bot, this.phaser.Physics.ARCADE);
+        this.bot.body.setSize(10, 14, 2, 1);
+    }
+
+    update(){
+        this.bot.body.velocity.set(0);
+    }
+
+    getBody(){
+        return this.bot;
+    }
+}
+
+class Weapon{
+    constructor(curSpriteName, curGame, phaser){
+        this.spriteName = curSpriteName;
+        this.game = curGame;
+        this.phaser = phaser;
+        //  Creates 1 single bullet, using the 'bullet' graphic
+        this.weapon = this.game.add.Weapon(0, this.spriteName);
+        //  The bullet will be automatically killed when it leaves the world bounds
+        this.weapon.bulletKillType = this.phaser.weapon.KILL_WORLD_BOUNDS;
+        //  Because our bullet is drawn facing up, we need to offset its rotation:
+        this.weapon.bulletAngleOffset = 90;
+        //  The speed at which the bullet is fired
+        this.weapon.bulletSpeed = 400;
+        //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
+        this.fireButton = this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
+    }
+
+    update(){
+        if (this.fireButton.isDown)
+        {
+            weapon.fire();
+        }
+    }
+
+    getBody(){
+        return this.weapon;
+    }
+}
 
 var map;
 var layer;
-var cursors;
+// var cursors;
 var player;
 var bot;
+var weapon;
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     //  Because we're loading CSV map data we have to specify the tile size here or we can't render it
     map = game.add.tilemap('map', 16, 16);
-
     //  Now add in the tileset
     map.addTilesetImage('tiles');
-
     //  Create our layer
     layer = map.createLayer(0);
-
     //  Resize the world
     layer.resizeWorld();
-
-    // //  This isn't totally accurate, but it'll do for now
+    //  This isn't totally accurate, but it'll do for now
     map.setCollisionBetween(54, 83);
 
     //  Un-comment this on to see the collision tiles
     // layer.debug = true;
 
-    //  Player
-    player = game.add.sprite(48, 48, 'player', 1);
-    player.animations.add('left', [8,9], 10, true);
-    player.animations.add('right', [1,2], 10, true);
-    player.animations.add('up', [11,12,13], 10, true);
-    player.animations.add('down', [4,5,6], 10, true);
+    player = new Player('player', game, Phaser);
+    bot = new Bot('bot', game, Phaser);
+    weapon = new Weapon('bullet', game, Phaser);
 
-    game.physics.enable(player, Phaser.Physics.ARCADE);
-
-    player.body.setSize(10, 14, 2, 1);
-
-    game.camera.follow(player);
-
-    cursors = game.input.keyboard.createCursorKeys();
+    //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
+    weapon.getBody().trackSprite(player.getBody(), 14, 0);
 
     var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
     help.fixedToCamera = true;
-
-    bot = game.add.sprite(300, 300, 'bot', 1);
-    game.physics.enable(bot, Phaser.Physics.ARCADE);
-    bot.body.setSize(10, 14, 2, 1);
-
-
-    fogCircle = new Phaser.Circle(800, 800, 800);
-    fringe = 64;
-    //  Create a new bitmap data the same size as our game
-    bmd = game.make.bitmapData(800, 600);
-    updateFogOfWar();
-    var fogSprite = bmd.addToWorld();
-    fogSprite.fixedToCamera = true;
-    var tween = game.add.tween(player).to({ x: 2000, y: 800 }, 15000, "Linear", true, 0, -1, true);
-    tween.onLoop.add(function (sprite, tween) {sprite.scale.x *= -1}, 0, this);
 }
 
 function update() {
 
-    // game.physics.arcade.collide(player, layer);
+    game.physics.arcade.collide(player.getBody(), layer);
+    game.physics.arcade.collide(bot.getBody(), layer);
+    game.physics.arcade.collide(player.getBody(), bot.getBody());
 
-    fogCircle.x = player.x;
-    fogCircle.y = player.y;
-
-    game.physics.arcade.collide(player, bot);
-
-    player.body.velocity.set(0);
-    bot.body.velocity.set(0);
-
-    if (cursors.left.isDown)
-    {
-        player.body.velocity.x = -100;
-        player.play('left');
-    }
-    else if (cursors.right.isDown)
-    {
-        player.body.velocity.x = 100;
-        player.play('right');
-    }
-    else if (cursors.up.isDown)
-    {
-        player.body.velocity.y = -100;
-        player.play('up');
-    }
-    else if (cursors.down.isDown)
-    {
-        player.body.velocity.y = 100;
-        player.play('down');
-    }
-    else
-    {
-        player.animations.stop();
-    }
-
-    updateFogOfWar();
+    bot.update();
+    player.update();
+    weapon.update();
 }
 
 function render() {
-
      //game.debug.body(player);
-
-}
-
-function updateFogOfWar ()
-{
-    var gradient = bmd.context.createRadialGradient(
-        fogCircle.x - game.camera.x,
-        fogCircle.y - game.camera.y,
-        fogCircle.radius,
-        fogCircle.x - game.camera.x,
-        fogCircle.y - game.camera.y,
-        fogCircle.radius - fringe
-    );
-
-    gradient.addColorStop(0, 'rgba(0,0,0,0.8');
-    gradient.addColorStop(0.4, 'rgba(0,0,0,0.5');
-    gradient.addColorStop(1, 'rgba(0,0,0,0');
-
-    bmd.clear();
-    bmd.context.fillStyle = gradient;
-    bmd.context.fillRect(0, 0, 800, 600);
 }
