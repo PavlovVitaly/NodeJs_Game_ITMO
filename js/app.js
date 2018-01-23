@@ -88,12 +88,15 @@ class Weapon{
         this.spriteName = curSpriteName;
         this.game = curGame;
         this.phaser = phaser;
+        this.cursors = this.game.input.keyboard.createCursorKeys();
         //  Creates 1 single bullet, using the 'bullet' graphic
-        this.weapon = this.game.add.Weapon(0, this.spriteName);
+        this.weapon = this.game.plugins.add(this.phaser.Weapon);
+        this.weapon.createBullets(10, 'bullet');
         //  The bullet will be automatically killed when it leaves the world bounds
-        this.weapon.bulletKillType = this.phaser.weapon.KILL_WORLD_BOUNDS;
+        this.weapon.bulletKillType = this.phaser.Weapon.KILL_WORLD_BOUNDS;
+        // this.weapon.bulletCollideWorldBounds = true;
         //  Because our bullet is drawn facing up, we need to offset its rotation:
-        this.weapon.bulletAngleOffset = 90;
+        this.weapon.bulletAngleOffset = -90;
         //  The speed at which the bullet is fired
         this.weapon.bulletSpeed = 400;
         //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
@@ -103,7 +106,23 @@ class Weapon{
     update(){
         if (this.fireButton.isDown)
         {
-            weapon.fire();
+            this.weapon.fire();
+        }
+        if (this.cursors.left.isDown)
+        {
+            this.weapon.fireAngle = this.phaser.ANGLE_LEFT;
+        }
+        else if (this.cursors.right.isDown)
+        {
+            this.weapon.fireAngle = this.phaser.ANGLE_RIGHT;
+        }
+        else if (this.cursors.up.isDown)
+        {
+            this.weapon.fireAngle = this.phaser.ANGLE_UP;
+        }
+        else if (this.cursors.down.isDown)
+        {
+            this.weapon.fireAngle = this.phaser.ANGLE_DOWN;
         }
     }
 
@@ -141,7 +160,7 @@ function create() {
     weapon = new Weapon('bullet', game, Phaser);
 
     //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
-    weapon.getBody().trackSprite(player.getBody(), 14, 0);
+    weapon.getBody().trackSprite(player.getBody(), 18, 0);
 
     var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
     help.fixedToCamera = true;
@@ -153,11 +172,22 @@ function update() {
     game.physics.arcade.collide(bot.getBody(), layer);
     game.physics.arcade.collide(player.getBody(), bot.getBody());
 
+    game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), killBot, null, this);
+
     bot.update();
     player.update();
     weapon.update();
+
+    game.world.wrap(player.getBody(), 16);
 }
 
 function render() {
      //game.debug.body(player);
+}
+
+
+//This is the function that is called when the bullet hits the meteor
+function killBot() {
+
+    bot.getBody().kill();
 }
