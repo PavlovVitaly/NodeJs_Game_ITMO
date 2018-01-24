@@ -91,7 +91,7 @@ class Weapon{
         this.cursors = this.game.input.keyboard.createCursorKeys();
         //  Creates 1 single bullet, using the 'bullet' graphic
         this.weapon = this.game.plugins.add(this.phaser.Weapon);
-        this.weapon.createBullets(10, 'bullet');
+        this.weapon.createBullets(100, 'bullet');
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = this.phaser.Weapon.KILL_WORLD_BOUNDS;
         // this.weapon.bulletCollideWorldBounds = true;
@@ -160,7 +160,7 @@ function create() {
     weapon = new Weapon('bullet', game, Phaser);
 
     //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
-    weapon.getBody().trackSprite(player.getBody(), 18, 0);
+    weapon.getBody().trackSprite(player.getBody(), 9, 9);
 
     var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
     help.fixedToCamera = true;
@@ -170,9 +170,11 @@ function update() {
 
     game.physics.arcade.collide(player.getBody(), layer);
     game.physics.arcade.collide(bot.getBody(), layer);
+    game.physics.arcade.collide(weapon.getBody(), layer);
     game.physics.arcade.collide(player.getBody(), bot.getBody());
 
-    game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), killBot, null, this);
+    game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), killBot);
+    game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall);
 
     bot.update();
     player.update();
@@ -187,7 +189,11 @@ function render() {
 
 
 //This is the function that is called when the bullet hits the meteor
-function killBot() {
+function killBot(bullet,bot) {
+    bot.kill();
+    bullet.kill();
+}
 
-    bot.getBody().kill();
+function hitWall(bullet,wall) {
+    bullet.kill();
 }
