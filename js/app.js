@@ -7,7 +7,9 @@ function preload() {
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
     game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
-    game.load.image('bullet', 'assets/sprites/bullet.png');
+    game.load.image('bomb', 'assets/sprites/bullet.png');
+    game.load.image('shmup-bullet', 'assets/sprites/shmup-bullet.png');
+    game.load.spritesheet('kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
 }
 
 class Player{
@@ -15,8 +17,10 @@ class Player{
         this.spriteName = curSpriteName;
         this.game = curGame;
         this.phaser = phaser;
+        this.weapon = new Weapon(new Bullet('bomb', 200, 1000, 50), this.game, this.phaser);
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.player = this.game.add.sprite(48, 48, this.spriteName, 1);
+        this.health = 100;
 
         this.player.animations.add('left', [8,9], 10, true);
         this.player.animations.add('right', [1,2], 10, true);
@@ -28,10 +32,14 @@ class Player{
         this.player.body.setSize(10, 14, 2, 1);
 
         this.game.camera.follow(this.player);
+
+        //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
+        this.weapon.getBody().trackSprite(this.player, 9, 9);
     }
 
     update(){
         this.player.body.velocity.set(0);
+        this.weapon.update();
 
         if (this.cursors.left.isDown)
         {
@@ -62,6 +70,20 @@ class Player{
     getBody(){
         return this.player;
     }
+
+    getWeapon(){
+        return this.weapon;
+    }
+
+    setWeapon(weapon){
+        this.weapon = weapon;
+        this.weapon.getBody().trackSprite(this.player, 9, 9);
+    }
+
+    setDefaultWeapon(){
+        this.weapon = new Weapon(new Bullet('bomb', 200, 1000, 50), this.game, this.phaser);
+        this.weapon.getBody().trackSprite(this.player, 9, 9);
+    }
 }
 
 class Bot{
@@ -69,7 +91,8 @@ class Bot{
         this.spriteName = curSpriteName;
         this.phaser = phaser;
         this.game = curGame;
-        this.bot = this.game.add.sprite(300, 320, this.spriteName, 1);
+        this.health = 100;
+        this.bot = this.game.add.sprite(48, 100, this.spriteName, 1);
         this.game.physics.enable(this.bot, this.phaser.Physics.ARCADE);
         this.bot.body.setSize(10, 14, 2, 1);
     }
@@ -81,24 +104,34 @@ class Bot{
     getBody(){
         return this.bot;
     }
+
+    damage(damage){
+        this.health = this.health - damage;
+        if(this.health <= 0){
+            this.bot.kill();
+        }
+    }
+
 }
 
 class Weapon{
-    constructor(curSpriteName, curGame, phaser){
-        this.spriteName = curSpriteName;
+    constructor(bullet, curGame, phaser){
+        this.spriteName = bullet.getSprite();
         this.game = curGame;
         this.phaser = phaser;
+        this.bullet = bullet;
         this.cursors = this.game.input.keyboard.createCursorKeys();
         //  Creates 1 single bullet, using the 'bullet' graphic
         this.weapon = this.game.plugins.add(this.phaser.Weapon);
-        this.weapon.createBullets(100, 'bullet');
+        this.weapon.createBullets(100, this.bullet.getSprite());
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = this.phaser.Weapon.KILL_WORLD_BOUNDS;
+        this.weapon.fireRate = this.bullet.getFireRate();
         // this.weapon.bulletCollideWorldBounds = true;
         //  Because our bullet is drawn facing up, we need to offset its rotation:
-        this.weapon.bulletAngleOffset = -90;
+        this.weapon.bulletAngleOffset = 0;
         //  The speed at which the bullet is fired
-        this.weapon.bulletSpeed = 400;
+        this.weapon.bulletSpeed = this.bullet.getSpeed();
         //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
         this.fireButton = this.game.input.keyboard.addKey(Phaser.KeyCode.SPACEBAR);
     }
@@ -129,6 +162,35 @@ class Weapon{
     getBody(){
         return this.weapon;
     }
+
+    getDamageSize(){
+        return this.bullet.getDamage();
+    }
+}
+
+class Bullet{
+    constructor(Sprite, Speed, fireRate, damage){
+        this.bulletSprite = Sprite;
+        this.bulletSpeed = Speed;
+        this.fireRate = fireRate;
+        this.damage = damage;
+    }
+
+    getSprite(){
+        return this.bulletSprite;
+    }
+
+    getSpeed(){
+        return this.bulletSpeed;
+    }
+
+    getFireRate(){
+        return this.fireRate;
+    }
+
+    getDamage(){
+        return this.damage;
+    }
 }
 
 var map;
@@ -136,7 +198,7 @@ var layer;
 // var cursors;
 var player;
 var bot;
-var weapon;
+var explosions;
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -157,10 +219,14 @@ function create() {
 
     player = new Player('player', game, Phaser);
     bot = new Bot('bot', game, Phaser);
-    weapon = new Weapon('bullet', game, Phaser);
 
-    //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
-    weapon.getBody().trackSprite(player.getBody(), 9, 9);
+    explosions = game.add.group();
+    for (var i = 0; i < 10; i++)
+    {
+        var explosionAnimation = explosions.create(0, 0, 'kaboom', [0], false);
+        explosionAnimation.anchor.setTo(0.5, 0.5);
+        explosionAnimation.animations.add('kaboom');
+    }
 
     var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
     help.fixedToCamera = true;
@@ -170,15 +236,14 @@ function update() {
 
     game.physics.arcade.collide(player.getBody(), layer);
     game.physics.arcade.collide(bot.getBody(), layer);
-    game.physics.arcade.collide(weapon.getBody(), layer);
+    game.physics.arcade.collide(player.getWeapon().getBody(), layer);
     game.physics.arcade.collide(player.getBody(), bot.getBody());
 
-    game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), killBot);
-    game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall);
+    game.physics.arcade.overlap(player.getWeapon().getBody().bullets, bot.getBody(), hitBot(player.getWeapon(), bot));
+    game.physics.arcade.collide(player.getWeapon().getBody().bullets, layer, hitWall);
 
     bot.update();
     player.update();
-    weapon.update();
 
     game.world.wrap(player.getBody(), 16);
 }
@@ -188,12 +253,24 @@ function render() {
 }
 
 
-//This is the function that is called when the bullet hits the meteor
-function killBot(bullet,bot) {
-    bot.kill();
-    bullet.kill();
+//This is the function that is called when the bullet hits the bot
+function hitBot(weapon, bot) {
+    /* FUUUUUUUUUUUCK!!!!! >_< If you are checking Group vs. Sprite, when Sprite will always be the first parameter.
+    * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
+    return function (bott, bullet) {
+        bot.damage(weapon.getDamageSize());
+        bulletHitEnemy (bullet);
+        bullet.kill();
+    };
 }
 
 function hitWall(bullet,wall) {
+    bulletHitEnemy (bullet);
     bullet.kill();
+}
+
+function bulletHitEnemy (bullet) {
+    var explosionAnimation = explosions.getFirstExists(false);
+    explosionAnimation.reset(bullet.x, bullet.y);
+    explosionAnimation.play('kaboom', 30, false, true);
 }
