@@ -3,18 +3,21 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
+    game.load.image('saw', 'assets/sprites/saw1.png');
     game.load.image('bomb', 'assets/sprites/bullet.png');
     game.load.image('rocket', 'assets/sprites/shmup-bullet.png');
-    game.load.spritesheet('kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
+    game.load.image('plazma', 'assets/sprites/plazma.png');
+    game.load.spritesheet('rocket_kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
+    game.load.spritesheet('bomb_kaboom', 'assets/sprites/explode.png', 128, 128);
 }
 
 var map;
 var layer;
 var player;
 var bot;
-var explosions;
+var help;
 
 function create() {
     game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -36,27 +39,25 @@ function create() {
     player = new Player('player', game, Phaser);
     bot = new Bot('bot', game, Phaser);
 
-    explosions = game.add.group();
-    for (var i = 0; i < 10; i++)
-    {
-        var explosionAnimation = explosions.create(0, 0, 'kaboom', [0], false);
-        explosionAnimation.anchor.setTo(0.5, 0.5);
-        explosionAnimation.animations.add('kaboom');
-    }
-
-    var help = game.add.text(16, 16, 'Arrows to move', { font: '14px Arial', fill: '#ffffff' });
+    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
+    help.inputEnabled = true;
     help.fixedToCamera = true;
 }
 
 function update() {
 
+    help.text = 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health;    // todo: change bot on player after debug.
     game.physics.arcade.collide(player.getBody(), layer);
     game.physics.arcade.collide(bot.getBody(), layer);
     game.physics.arcade.collide(player.getWeapon().getBody(), layer);
     game.physics.arcade.collide(player.getBody(), bot.getBody());
 
-    game.physics.arcade.overlap(player.getWeapon().getBody().bullets, bot.getBody(), hitBot(player.getWeapon(), bot));
-    game.physics.arcade.collide(player.getWeapon().getBody().bullets, layer, hitWall);
+
+    player.getWeapons().forEach(function(weapon, i, arr){
+        if(weapon === null) return;
+        game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+        game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
+    }, this);
 
     bot.update();
     player.update();
@@ -75,18 +76,15 @@ function hitBot(weapon, bot) {
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
     return function (bott, bullet) {
         bot.damage(weapon.getDamageSize());
-        // bulletHitEnemy (bullet);
+        weapon.explodeBullet(bullet);
         bullet.kill();
     };
 }
 
-function hitWall(bullet,wall) {
-    // bulletHitEnemy (bullet);
-    bullet.kill();
-}
-
-function bulletHitEnemy (bullet) {
-    var explosionAnimation = explosions.getFirstExists(false);
-    explosionAnimation.reset(bullet.x, bullet.y);
-    explosionAnimation.play('kaboom', 30, false, true);
+function hitWall(weapon)
+{
+    return function (bullet, wall) {
+        weapon.explodeBullet(bullet);
+        bullet.kill();
+    }
 }
