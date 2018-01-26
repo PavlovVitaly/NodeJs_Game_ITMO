@@ -7,11 +7,13 @@ class Weapon{
         this.cursors = this.game.input.keyboard.createCursorKeys();
         //  Creates 1 single bullet, using the 'bullet' graphic
         this.weapon = this.game.plugins.add(this.phaser.Weapon);
-        this.weapon.createBullets(100, this.bullet.getSprite());
+        this.weapon.createBullets(1000, this.bullet.getSprite());
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = this.bullet.getKillType();
         this.weapon.fireRate = this.bullet.getFireRate();
-        this.weapon.fireAngle = this.phaser.ANGLE_RIGHT
+        this.weapon.fireAngle = this.phaser.ANGLE_RIGHT;
+        //  Add a variance to the bullet angle by +- this value
+        this.weapon.bulletAngleVariance = this.bullet.getDispersion();
         // this.weapon.bulletCollideWorldBounds = true;
         //  Because our bullet is drawn facing up, we need to offset its rotation:
         this.weapon.bulletAngleOffset = this.bullet.getSpriteAngle();

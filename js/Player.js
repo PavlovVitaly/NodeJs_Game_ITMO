@@ -3,20 +3,32 @@ class Player{
         this.spriteName = spriteName;
         this.game = game;
         this.phaser = phaser;
-        this.weaponArr = [null,
-            new Weapon(new BulletType('saw', 100, 10, 1, this.phaser.Weapon.KILL_DISTANCE), this.game, this.phaser),
-            new Weapon(new BulletType('rocket', 300, 500, 20, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), this.game, this.phaser),
-            new Weapon(new BulletType('bomb', 150, 1000, 70, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('bomb_kaboom', this.game, this.phaser)), this.game, this.phaser),
-            new Weapon(new BulletType('plazma', 800, 1000, 30, this.phaser.Weapon.KILL_WORLD_BOUNDS, 90), this.game, this.phaser)];
+        this.weaponArr = [
+            new Weapon(new BulletType('saw', 100, 10, 1, 0, this.phaser.Weapon.KILL_DISTANCE), this.game, this.phaser),
+            new Weapon(new BulletType('bullet', 300, 200, 5, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS), this.game, this.phaser),
+            new Weapon(new BulletType('rocket', 300, 500, 20, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), this.game, this.phaser),
+            new Weapon(new BulletType('bomb', 150, 1000, 70, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('bomb_kaboom', this.game, this.phaser)), this.game, this.phaser),
+            new Weapon(new BulletType('plazma', 800, 1000, 50, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 90), this.game, this.phaser),
+            new Weapon(new BulletType('flame_thrower', 100, 20, 5, 10, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0), this.game, this.phaser)];
         this.weapon = this.weaponArr[1];
+        this.numCurWeapon = 1;
+        this.offsetWeaponSprite = [
+            [[9, 9], [9, 9], [9, 9], [9, 9]],
+            [[9, 9], [9, 9], [9, 9], [9, 9]],
+            [[9, 9], [9, 9], [9, 9], [9, 9]],
+            [[9, 9], [9, 9], [9, 9], [9, 9]],
+            [[9, -15], [38, 9], [9, 40], [-20, 9]],
+            [[9, -15], [38, 9], [9, 40], [-20, 9]]];
 
         this.cursors = this.game.input.keyboard.createCursorKeys();
-        this.weaponSelector = [null,
+        this.weaponSelector = [
+            this.game.input.keyboard.addKey(this.phaser.Keyboard.Q),
             this.game.input.keyboard.addKey(this.phaser.Keyboard.ONE),
             this.game.input.keyboard.addKey(this.phaser.Keyboard.TWO),
             this.game.input.keyboard.addKey(this.phaser.Keyboard.THREE),
             this.game.input.keyboard.addKey(this.phaser.Keyboard.FOUR),
-            this.game.input.keyboard.addKey(this.phaser.Keyboard.FIVE)
+            this.game.input.keyboard.addKey(this.phaser.Keyboard.FIVE),
+            this.game.input.keyboard.addKey(this.phaser.Keyboard.SIX)
         ];
         this.fireButton = this.game.input.keyboard.addKey(this.phaser.KeyCode.SPACEBAR);
 
@@ -46,17 +58,29 @@ class Player{
             this.weapon.getBody().fire();
         }
 
-        if(this.weaponSelector[1].isDown){
-            this.setWeapon(this.weaponArr[1]);
+        if(this.weaponSelector[0].isDown){
+            this.numCurWeapon = 0;
+            this.setWeapon(this.weaponArr[0], this.numCurWeapon);
+        }
+        else if(this.weaponSelector[1].isDown){
+            this.numCurWeapon = 1;
+            this.setWeapon(this.weaponArr[1], this.numCurWeapon);
         }
         else if(this.weaponSelector[2].isDown){
-            this.setWeapon(this.weaponArr[2]);
+            this.numCurWeapon = 2;
+            this.setWeapon(this.weaponArr[2], this.numCurWeapon);
         }
         else if(this.weaponSelector[3].isDown){
-            this.setWeapon(this.weaponArr[3]);
+            this.numCurWeapon = 3;
+            this.setWeapon(this.weaponArr[3], this.numCurWeapon);
         }
         else if(this.weaponSelector[4].isDown){
-            this.setWeapon(this.weaponArr[4]);
+            this.numCurWeapon = 4;
+            this.setWeapon(this.weaponArr[4], this.numCurWeapon);
+        }
+        else if(this.weaponSelector[5].isDown){
+            this.numCurWeapon = 5;
+            this.setWeapon(this.weaponArr[5], this.numCurWeapon);
         }
 
         if (this.cursors.left.isDown)
@@ -64,24 +88,32 @@ class Player{
             this.player.body.velocity.x = -100;
             this.weapon.getBody().fireAngle = this.phaser.ANGLE_LEFT;
             this.player.play('left');
+            this.weapon.getBody().trackSprite(this.player,
+                this.offsetWeaponSprite[this.numCurWeapon][3][0], this.offsetWeaponSprite[this.numCurWeapon][3][1]);
         }
         else if (this.cursors.right.isDown)
         {
             this.player.body.velocity.x = 100;
             this.weapon.getBody().fireAngle = this.phaser.ANGLE_RIGHT;
             this.player.play('right');
+            this.weapon.getBody().trackSprite(this.player,
+                this.offsetWeaponSprite[this.numCurWeapon][1][0], this.offsetWeaponSprite[this.numCurWeapon][1][1]);
         }
         else if (this.cursors.up.isDown)
         {
             this.player.body.velocity.y = -100;
             this.weapon.getBody().fireAngle = this.phaser.ANGLE_UP;
             this.player.play('up');
+            this.weapon.getBody().trackSprite(this.player,
+                this.offsetWeaponSprite[this.numCurWeapon][0][0], this.offsetWeaponSprite[this.numCurWeapon][0][1]);
         }
         else if (this.cursors.down.isDown)
         {
             this.player.body.velocity.y = 100;
             this.weapon.getBody().fireAngle = this.phaser.ANGLE_DOWN;
             this.player.play('down');
+            this.weapon.getBody().trackSprite(this.player,
+                this.offsetWeaponSprite[this.numCurWeapon][2][0], this.offsetWeaponSprite[this.numCurWeapon][2][1]);
         }
         else
         {
@@ -101,10 +133,28 @@ class Player{
         return this.weaponArr;
     }
 
-    setWeapon(weapon){
+    setWeapon(weapon, nextNumOfWeapon){
         var fireAngle = this.weapon.getBody().fireAngle;
         this.weapon = weapon;
-        this.weapon.getBody().trackSprite(this.player, 9, 9);
         this.weapon.getBody().fireAngle = fireAngle;
+        this.weapon.getBody().trackSprite(this.player, 9, 9);
+        switch(fireAngle){
+            case this.phaser.ANGLE_LEFT:
+                this.weapon.getBody().trackSprite(this.player,
+                    this.offsetWeaponSprite[nextNumOfWeapon][3][0], this.offsetWeaponSprite[this.numCurWeapon][3][1]);
+                break;
+            case this.phaser.ANGLE_RIGHT:
+                this.weapon.getBody().trackSprite(this.player,
+                    this.offsetWeaponSprite[nextNumOfWeapon][1][0], this.offsetWeaponSprite[this.numCurWeapon][1][1]);
+                break;
+            case this.phaser.ANGLE_UP:
+                this.weapon.getBody().trackSprite(this.player,
+                    this.offsetWeaponSprite[nextNumOfWeapon][0][0], this.offsetWeaponSprite[this.numCurWeapon][0][1]);
+                break;
+            case this.phaser.ANGLE_DOWN:
+                this.weapon.getBody().trackSprite(this.player,
+                    this.offsetWeaponSprite[nextNumOfWeapon][2][0], this.offsetWeaponSprite[this.numCurWeapon][2][1]);
+                break;
+        }
     }
 }

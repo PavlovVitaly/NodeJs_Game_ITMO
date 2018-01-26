@@ -7,8 +7,10 @@ function preload() {
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.image('saw', 'assets/sprites/saw1.png');
     game.load.image('bomb', 'assets/sprites/bullet.png');
+    game.load.image('bullet', 'assets/sprites/bubble.png');
     game.load.image('rocket', 'assets/sprites/shmup-bullet.png');
     game.load.image('plazma', 'assets/sprites/plazma.png');
+    game.load.image('flame_thrower', 'assets/sprites/fire.png');
     game.load.spritesheet('rocket_kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
     game.load.spritesheet('bomb_kaboom', 'assets/sprites/explode.png', 128, 128);
 }
