@@ -59,6 +59,7 @@ class Player{
         }
 
         if(this.weaponSelector[0].isDown){
+            // this.weapon.getBody().resetShots(10);//////////////////////////////////////////////////////////////////////////LOOK AT ME!!!
             this.numCurWeapon = 0;
             this.setWeapon(this.weaponArr[0], this.numCurWeapon);
         }

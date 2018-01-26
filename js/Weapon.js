@@ -8,6 +8,8 @@ class Weapon{
         //  Creates 1 single bullet, using the 'bullet' graphic
         this.weapon = this.game.plugins.add(this.phaser.Weapon);
         this.weapon.createBullets(1000, this.bullet.getSprite());
+        // this.weapon.fireLimit = 3;//////////////////////////////////////////////////////////////////////////LOOK AT ME!!!
+        // this.weapon.bulletKillDistance = 0;//////////////////////////////////////////////////////////////////////////LOOK AT ME!!!
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = this.bullet.getKillType();
         this.weapon.fireRate = this.bullet.getFireRate();
