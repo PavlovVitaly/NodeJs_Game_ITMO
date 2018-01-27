@@ -1,16 +1,56 @@
-var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: create, update: update, render: render });
+var ready = false;
+var eurecaServer;
+//this function will handle client communication with the server
+var eurecaClientSetup = function() {
+    //create an instance of eureca.io client
+    var eurecaClient = new Eureca.Client();
+
+    eurecaClient.ready(function (proxy) {
+        eurecaServer = proxy;
+    });
+
+    //methods defined under "exports" namespace become available in the server side
+    eurecaClient.exports.setId = function(id)
+    {
+        //create() is moved here to make sure nothing is created before uniq id assignation
+        myId = id;
+        create();
+        eurecaServer.handshake();
+        ready = true;
+    }
+    eurecaClient.exports.kill = function(id)
+    {
+        if (tanksList[id]) {
+            tanksList[id].kill();
+            console.log('killing ', id, tanksList[id]);
+        }
+    }
+    eurecaClient.exports.spawnEnemy = function(i, x, y)
+    {
+
+        if (i == myId) return; //this is me
+
+        console.log('SPAWN');
+        var tnk = new Tank(i, game, tank);
+        tanksList[i] = tnk;
+    }
+};
+
+
+
+var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });
 
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
     game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
-    game.load.image('saw', 'assets/sprites/saw1.png');
-    game.load.image('bomb', 'assets/sprites/bullet.png');
-    game.load.image('bullet', 'assets/sprites/bubble.png');
-    game.load.image('rocket', 'assets/sprites/shmup-bullet.png');
-    game.load.image('plazma', 'assets/sprites/plazma.png');
-    game.load.image('flame_thrower', 'assets/sprites/fire.png');
+    game.load.image('Saw', 'assets/sprites/saw1.png');
+    game.load.image('Bomb', 'assets/sprites/bullet.png');
+    game.load.image('Bullet', 'assets/sprites/bubble.png');
+    game.load.image('Rocket', 'assets/sprites/shmup-bullet.png');
+    game.load.image('Plazma', 'assets/sprites/plazma.png');
+    game.load.image('Flame-Thrower', 'assets/sprites/fire.png');
     game.load.spritesheet('rocket_kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
     game.load.spritesheet('bomb_kaboom', 'assets/sprites/explode.png', 128, 128);
 }
@@ -47,7 +87,8 @@ function create() {
 }
 
 function update() {
-
+    //do not update if client not ready
+    if (!ready) return;
     help.text = 'Bot health: ' + bot.health + '\nHealth: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
     game.physics.arcade.collide(player.getBody(), layer);
     game.physics.arcade.collide(bot.getBody(), layer);
