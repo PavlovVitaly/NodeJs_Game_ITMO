@@ -4,12 +4,12 @@ class Player{
         this.game = game;
         this.phaser = phaser;
         this.weaponArr = [
-            new Weapon(new BulletType('saw', 100, 10, 1, 0, this.phaser.Weapon.KILL_DISTANCE), this.game, this.phaser),
-            new Weapon(new BulletType('bullet', 300, 200, 5, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS), this.game, this.phaser),
-            new Weapon(new BulletType('rocket', 300, 500, 20, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), this.game, this.phaser),
-            new Weapon(new BulletType('bomb', 150, 1000, 70, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0, new Explosion('bomb_kaboom', this.game, this.phaser)), this.game, this.phaser),
-            new Weapon(new BulletType('plazma', 800, 1000, 50, 0, this.phaser.Weapon.KILL_WORLD_BOUNDS, 90), this.game, this.phaser),
-            new Weapon(new BulletType('flame_thrower', 100, 20, 5, 10, this.phaser.Weapon.KILL_WORLD_BOUNDS, 0), this.game, this.phaser)];
+            new Weapon(new BulletType('saw', 100, 10, 1, 0, 0, this.phaser.Weapon.KILL_DISTANCE), 1000000000000, this.game, this.phaser),
+            new Weapon(new BulletType('bullet', 300, 200, 5, 500, 0, this.phaser.Weapon.KILL_DISTANCE), 500, this.game, this.phaser),
+            new Weapon(new BulletType('rocket', 300, 500, 20, 700, 0, this.phaser.Weapon.KILL_DISTANCE, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), 100, this.game, this.phaser),
+            new Weapon(new BulletType('bomb', 150, 1000, 70, 300, 0, this.phaser.Weapon.KILL_DISTANCE, 90, new Explosion('bomb_kaboom', this.game, this.phaser)), 50, this.game, this.phaser),
+            new Weapon(new BulletType('plazma', 800, 1000, 50, 1500, 0, this.phaser.Weapon.KILL_DISTANCE, 90), 20, this.game, this.phaser),
+            new Weapon(new BulletType('flame_thrower', 100, 20, 5, 200, 10, this.phaser.Weapon.KILL_DISTANCE, 0), 300, this.game, this.phaser)];
         this.weapon = this.weaponArr[1];
         this.numCurWeapon = 1;
         this.offsetWeaponSprite = [
@@ -52,6 +52,10 @@ class Player{
 
     update(){
         this.player.body.velocity.set(0);
+
+        this.weaponArr.forEach(function(weapon, i, arr){
+            weapon.updateBulletCounter();
+        }, this);
 
         if (this.fireButton.isDown)
         {
@@ -157,5 +161,17 @@ class Player{
                     this.offsetWeaponSprite[nextNumOfWeapon][2][0], this.offsetWeaponSprite[this.numCurWeapon][2][1]);
                 break;
         }
+    }
+
+    getHealth(){
+        return this.health;
+    }
+
+    getCurNumBullets(){
+        return this.weapon.getNumBullets();
+    }
+
+    reloadWeapon(){
+
     }
 }

@@ -48,7 +48,7 @@ function create() {
 
 function update() {
 
-    help.text = 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health + '\nShots: ' + player.weapon.getBody().shots;    // todo: change bot on player after debug.
+    help.text = 'Bot health: ' + bot.health + '\nHealth: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
     game.physics.arcade.collide(player.getBody(), layer);
     game.physics.arcade.collide(bot.getBody(), layer);
     game.physics.arcade.collide(player.getWeapon().getBody(), layer);

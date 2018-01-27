@@ -1,10 +1,11 @@
 
 class BulletType{
-    constructor(Sprite, Speed, fireRate, damage, dispersion, killType, spriteAngle = 0, explosion = null ){
+    constructor(Sprite, Speed, fireRate, damage, distance, dispersion, killType, spriteAngle = 0, explosion = null ){
         this.bulletSprite = Sprite;
         this.bulletSpeed = Speed;
         this.fireRate = fireRate;
         this.damage = damage;
+        this.distance = distance;
         this.dispersion = dispersion;
         this.spriteAngle = spriteAngle;
         this.explosion = explosion;
@@ -29,6 +30,10 @@ class BulletType{
 
     getDispersion(){
         return this.dispersion;
+    }
+
+    getDistance(){
+        return this.distance;
     }
 
     getSpriteAngle(){
