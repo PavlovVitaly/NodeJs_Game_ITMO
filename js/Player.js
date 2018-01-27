@@ -1,5 +1,6 @@
 class Player{
-    constructor(spriteName, game, phaser){
+    constructor(id, spriteName, game, phaser){
+        this.id = id;
         this.spriteName = spriteName;
         this.game = game;
         this.phaser = phaser;
@@ -32,7 +33,7 @@ class Player{
         ];
         this.fireButton = this.game.input.keyboard.addKey(this.phaser.KeyCode.SPACEBAR);
 
-        this.player = this.game.add.sprite(48, 48, this.spriteName, 1);
+        this.player = this.game.add.sprite(Math.random()*100, Math.random()*100, this.spriteName, 1);//48,48
         this.health = 100;
 
         this.player.animations.add('left', [8,9], 10, true);
@@ -173,5 +174,9 @@ class Player{
 
     reloadWeapon(){
 
+    }
+
+    kill(){
+        this.player.kill();
     }
 }

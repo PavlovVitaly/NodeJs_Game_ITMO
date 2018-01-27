@@ -1,3 +1,6 @@
+var myId=0;
+var playerList = [];
+var player;
 var ready = false;
 var eurecaServer;
 //this function will handle client communication with the server
@@ -18,21 +21,22 @@ var eurecaClientSetup = function() {
         eurecaServer.handshake();
         ready = true;
     }
+
     eurecaClient.exports.kill = function(id)
     {
-        if (tanksList[id]) {
-            tanksList[id].kill();
-            console.log('killing ', id, tanksList[id]);
+        if (playerList[id]) {
+            playerList[id].kill();
+            console.log('killing ', id, playerList[id]);
         }
     }
+
     eurecaClient.exports.spawnEnemy = function(i, x, y)
     {
-
         if (i == myId) return; //this is me
 
         console.log('SPAWN');
-        var tnk = new Tank(i, game, tank);
-        tanksList[i] = tnk;
+        var player = new Player(i, 'player', game, Phaser);
+        playerList[i] = player;
     }
 };
 
@@ -43,7 +47,7 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.image('Saw', 'assets/sprites/saw1.png');
     game.load.image('Bomb', 'assets/sprites/bullet.png');
@@ -57,7 +61,6 @@ function preload() {
 
 var map;
 var layer;
-var player;
 var bot;
 var help;
 
@@ -77,8 +80,8 @@ function create() {
 
     //  Un-comment this on to see the collision tiles
     // layer.debug = true;
-
-    player = new Player('player', game, Phaser);
+    player = new Player(myId, 'player', game, Phaser);
+    playerList[myId] = player;
     bot = new Bot('bot', game, Phaser);
 
     help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
