@@ -109,20 +109,19 @@ function update() {
     //do not update if client not ready
     if (!ready) return;
     help.text = 'Health: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
-    game.physics.arcade.collide(player.getBody(), layer);
+
     // game.physics.arcade.collide(bot.getBody(), layer);
-    game.physics.arcade.collide(player.getWeapon().getBody(), layer);
+
     // game.physics.arcade.collide(player.getBody(), bot.getBody());
-
-
-    player.getWeapons().forEach(function(weapon, i, arr){
-        if(weapon === null) return;
-        // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
-        game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
-    }, this);
 
     // bot.update();
     for(var i=0; i<idList.length; i++){
+        game.physics.arcade.collide(player.getBody(), layer);
+        game.physics.arcade.collide(player.getWeapon().getBody(), layer);
+        player.getWeapons().forEach(function(weapon, i, arr){
+            // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+            game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
+        }, this);
         playerList[idList[i]].update();
     }
     // playerList.forEach(function(player, i, arr){
