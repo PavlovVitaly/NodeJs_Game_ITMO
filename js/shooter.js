@@ -116,9 +116,9 @@ function update() {
 
     // bot.update();
     for(var i=0; i<idList.length; i++){
-        game.physics.arcade.collide(player.getBody(), layer);
-        game.physics.arcade.collide(player.getWeapon().getBody(), layer);
-        player.getWeapons().forEach(function(weapon, i, arr){
+        game.physics.arcade.collide(playerList[idList[i]].getBody(), layer);
+        game.physics.arcade.collide(playerList[idList[i]].getWeapon().getBody(), layer);
+        playerList[idList[i]].getWeapons().forEach(function(weapon, i, arr){
             // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
         }, this);
