@@ -1,5 +1,6 @@
 var myId=0;
 var playerList = [];
+var idList = [];
 var player;
 var ready = false;
 var eurecaServer;
@@ -17,6 +18,7 @@ var eurecaClientSetup = function() {
     {
         //create() is moved here to make sure nothing is created before uniq id assignation
         myId = id;
+        idList.push(myId);
         create();
         eurecaServer.handshake();
         ready = true;
@@ -35,8 +37,21 @@ var eurecaClientSetup = function() {
         if (i == myId) return; //this is me
 
         console.log('SPAWN');
-        var player = new Player(i, 'player', game, Phaser);
+        var player = new Player(i, 'player', game, Phaser, eurecaServer);
+        idList.push(i);
         playerList[i] = player;
+    }
+
+    eurecaClient.exports.updateState = function(id, state)
+    {
+        if (playerList[id])  {
+            playerList[id].cursor = state;
+            playerList[id].player.x = state.x;
+            playerList[id].player.y = state.y;
+            // playerList[id].player.angle = state.angle;
+            // playerList[id].player.rotation = state.rot;
+            playerList[id].update();
+        }
     }
 };
 
@@ -80,11 +95,12 @@ function create() {
 
     //  Un-comment this on to see the collision tiles
     // layer.debug = true;
-    player = new Player(myId, 'player', game, Phaser);
+    player = new Player(myId, 'player', game, Phaser, eurecaServer);
     playerList[myId] = player;
-    bot = new Bot('bot', game, Phaser);
+    // bot = new Bot('bot', game, Phaser);
 
-    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
+    // help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
+    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
     help.inputEnabled = true;
     help.fixedToCamera = true;
 }
@@ -92,22 +108,29 @@ function create() {
 function update() {
     //do not update if client not ready
     if (!ready) return;
-    help.text = 'Bot health: ' + bot.health + '\nHealth: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
+    help.text = 'Health: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
     game.physics.arcade.collide(player.getBody(), layer);
-    game.physics.arcade.collide(bot.getBody(), layer);
+    // game.physics.arcade.collide(bot.getBody(), layer);
     game.physics.arcade.collide(player.getWeapon().getBody(), layer);
-    game.physics.arcade.collide(player.getBody(), bot.getBody());
+    // game.physics.arcade.collide(player.getBody(), bot.getBody());
 
 
     player.getWeapons().forEach(function(weapon, i, arr){
         if(weapon === null) return;
-        game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+        // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
         game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
     }, this);
 
-    bot.update();
-    player.update();
-
+    // bot.update();
+    for(var i=0; i<idList.length; i++){
+        playerList[idList[i]].update();
+    }
+    // playerList.forEach(function(player, i, arr){
+    //     alert(1);
+    //     player.update();
+    //     alert(1);
+    // }, this);
+    // player.update();
     game.world.wrap(player.getBody(), 16);
 }
 
