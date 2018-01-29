@@ -1,5 +1,5 @@
 var myId=0;
-var playerList = [];
+var playerList = {};
 var idList = [];
 var player;
 var ready = false;
@@ -45,12 +45,38 @@ var eurecaClientSetup = function() {
     eurecaClient.exports.updateState = function(id, state)
     {
         if (playerList[id])  {
-            playerList[id].cursor = state;
-            playerList[id].player.x = state.x;
-            playerList[id].player.y = state.y;
-            // playerList[id].player.angle = state.angle;
-            // playerList[id].player.rotation = state.rot;
-            playerList[id].update();
+            // playerList[id].cursor = state;
+            if(state.left === true){
+                playerList[id].cursor.left = true;
+            }else{
+                playerList[id].cursor.left = false;
+            }
+
+            if(state.right === true){
+                playerList[id].cursor.right = true;
+            }else{
+                playerList[id].cursor.right = false;
+            }
+
+            if(state.up === true){
+                playerList[id].cursor.up = true;
+            }else{
+                playerList[id].cursor.up = false;
+            }
+
+            if(state.down === true){
+                playerList[id].cursor.down = true;
+            }else{
+                playerList[id].cursor.down = false;
+            }
+
+            if(id!=myId){
+                console.log('\nUpdated id: ' + id + '\nleft: ' + playerList[id].cursor.left + '\nright: ' + playerList[id].cursor.right + '\nup: ' + playerList[id].cursor.up + '\ndown: ' + playerList[id].cursor.down + '\n');
+            }
+            // playerList[id].player.x = state.x;
+            // playerList[id].player.y = state.y;
+            // console.log('id: ' + id + 'left: ' + state.left + '\n' + 'right: ' + state.right + '\n' + 'up: ' + state.up + '\n' + 'down: ' + state.down + '\n' + 'x: ' + state.x + '\n' + 'y: ' + state.y + '\n');
+            // playerList[id].update();
         }
     }
 };
@@ -111,25 +137,20 @@ function update() {
     help.text = 'Health: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
 
     // game.physics.arcade.collide(bot.getBody(), layer);
-
     // game.physics.arcade.collide(player.getBody(), bot.getBody());
-
     // bot.update();
-    for(var i=0; i<idList.length; i++){
-        game.physics.arcade.collide(playerList[idList[i]].getBody(), layer);
-        game.physics.arcade.collide(playerList[idList[i]].getWeapon().getBody(), layer);
-        playerList[idList[i]].getWeapons().forEach(function(weapon, i, arr){
-            // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
-            game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
-        }, this);
-        playerList[idList[i]].update();
-    }
-    // playerList.forEach(function(player, i, arr){
-    //     alert(1);
-    //     player.update();
-    //     alert(1);
-    // }, this);
-    // player.update();
+
+    for (var i in playerList)
+    {
+        if (!playerList[i]) continue;
+        // game.physics.arcade.collide(playerList[i].getBody(), layer);
+        // game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
+        // playerList[i].getWeapons().forEach(function(weapon, i, arr){
+        //     // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+        //     game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
+        // }, this);
+        playerList[i].update();
+    };
     game.world.wrap(player.getBody(), 16);
 }
 

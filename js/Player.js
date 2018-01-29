@@ -58,7 +58,7 @@ class Player{
             up:false,
             down:false,
             fire:false
-        }
+        };
 
         this.input = {
             left:false,
@@ -68,7 +68,7 @@ class Player{
             fire:false,
             x:0,
             y:0
-        }
+        };
     }
 
     update(){
@@ -136,6 +136,9 @@ class Player{
             this.setWeapon(this.weaponArr[5], this.numCurWeapon);
         }
 
+        if(this.id != myId) {
+            console.log('\nid: ' + this.id + '\nleft: ' + this.cursor.left + '\nright: ' + this.cursor.right + '\nup: ' + this.cursor.up + '\ndown: ' + this.cursor.down + '\n');
+        }
         if (this.cursor.left)
         {
             this.player.body.velocity.x = -100;
