@@ -70,13 +70,10 @@ var eurecaClientSetup = function() {
                 playerList[id].cursor.down = false;
             }
 
-            if(id!=myId){
-                console.log('\nUpdated id: ' + id + '\nleft: ' + playerList[id].cursor.left + '\nright: ' + playerList[id].cursor.right + '\nup: ' + playerList[id].cursor.up + '\ndown: ' + playerList[id].cursor.down + '\n');
-            }
-            // playerList[id].player.x = state.x;
-            // playerList[id].player.y = state.y;
+            playerList[id].player.x = state.x;
+            playerList[id].player.y = state.y;
             // console.log('id: ' + id + 'left: ' + state.left + '\n' + 'right: ' + state.right + '\n' + 'up: ' + state.up + '\n' + 'down: ' + state.down + '\n' + 'x: ' + state.x + '\n' + 'y: ' + state.y + '\n');
-            // playerList[id].update();
+            playerList[id].update();
         }
     }
 };
@@ -143,12 +140,12 @@ function update() {
     for (var i in playerList)
     {
         if (!playerList[i]) continue;
-        // game.physics.arcade.collide(playerList[i].getBody(), layer);
-        // game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
-        // playerList[i].getWeapons().forEach(function(weapon, i, arr){
-        //     // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
-        //     game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
-        // }, this);
+        game.physics.arcade.collide(playerList[i].getBody(), layer);
+        game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
+        playerList[i].getWeapons().forEach(function(weapon, i, arr){
+            // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+            game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
+        }, this);
         playerList[i].update();
     };
     game.world.wrap(player.getBody(), 16);

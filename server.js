@@ -60,7 +60,6 @@ eurecaServer.exports.handshake = function()
             remote.spawnEnemy(clients[cc].id, x, y);
         }
     }
-    console.log(clients);
 };
 
 eurecaServer.exports.handleKeys = function (keys) {
