@@ -57,7 +57,13 @@ class Player{
             right:false,
             up:false,
             down:false,
-            fire:false
+            fire:false,
+            weapon1:false,
+            weapon2:false,
+            weapon3:false,
+            weapon4:false,
+            weapon5:false,
+            weaponQ:false
         };
 
         this.input = {
@@ -66,6 +72,12 @@ class Player{
             up:false,
             down:false,
             fire:false,
+            weapon1:false,
+            weapon2:false,
+            weapon3:false,
+            weapon4:false,
+            weapon5:false,
+            weaponQ:false,
             x:0,
             y:0
         };
@@ -84,6 +96,10 @@ class Player{
 
         var inputChanged = (
             this.cursor.left != this.input.left ||
+            this.cursor.right != this.input.right ||
+            this.cursor.up != this.input.up ||
+            this.cursor.down != this.input.down ||
+            this.cursor.fire != this.input.fire ||
             this.cursor.right != this.input.right ||
             this.cursor.up != this.input.up ||
             this.cursor.down != this.input.down
