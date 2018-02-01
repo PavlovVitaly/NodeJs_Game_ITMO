@@ -7,7 +7,7 @@ var eurecaServer;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    var eurecaClient = new Eureca.Client();
+    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
@@ -22,57 +22,33 @@ var eurecaClientSetup = function() {
         create();
         eurecaServer.handshake();
         ready = true;
-    }
+    };
 
     eurecaClient.exports.kill = function(id)
     {
         if (playerList[id]) {
             playerList[id].kill();
+            playerList[id] = null;
             console.log('killing ', id, playerList[id]);
         }
-    }
+    };
 
     eurecaClient.exports.spawnEnemy = function(i, x, y)
     {
-        if (i == myId) return; //this is me
+        if (i === myId) return; //this is me
 
         console.log('SPAWN');
         var player = new Player(i, 'player', game, Phaser, eurecaServer);
         idList.push(i);
         playerList[i] = player;
-    }
+    };
 
     eurecaClient.exports.updateState = function(id, state)
     {
         if (playerList[id])  {
-            // playerList[id].cursor = state;
-            if(state.left === true){
-                playerList[id].cursor.left = true;
-            }else{
-                playerList[id].cursor.left = false;
-            }
-
-            if(state.right === true){
-                playerList[id].cursor.right = true;
-            }else{
-                playerList[id].cursor.right = false;
-            }
-
-            if(state.up === true){
-                playerList[id].cursor.up = true;
-            }else{
-                playerList[id].cursor.up = false;
-            }
-
-            if(state.down === true){
-                playerList[id].cursor.down = true;
-            }else{
-                playerList[id].cursor.down = false;
-            }
-
+            playerList[id].cursor = state;
             playerList[id].player.x = state.x;
             playerList[id].player.y = state.y;
-            // console.log('id: ' + id + 'left: ' + state.left + '\n' + 'right: ' + state.right + '\n' + 'up: ' + state.up + '\n' + 'down: ' + state.down + '\n' + 'x: ' + state.x + '\n' + 'y: ' + state.y + '\n');
             playerList[id].update();
         }
     }
@@ -120,6 +96,7 @@ function create() {
     // layer.debug = true;
     player = new Player(myId, 'player', game, Phaser, eurecaServer);
     playerList[myId] = player;
+    game.camera.follow(player.player);
     // bot = new Bot('bot', game, Phaser);
 
     // help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
@@ -142,6 +119,8 @@ function update() {
         if (!playerList[i]) continue;
         game.physics.arcade.collide(playerList[i].getBody(), layer);
         game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
+        // if(player !== playerList[i])
+        //     game.physics.arcade.collide(player.getBody(), playerList[i].getBody());
         playerList[i].getWeapons().forEach(function(weapon, i, arr){
             // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
@@ -157,11 +136,11 @@ function render() {
 
 
 //This is the function that is called when the bullet hits the bot
-function hitBot(weapon, bot) {
+function hitEnemy(weapon, player) {
     /* FUUUUUUUUUUUCK!!!!! >_< If you are checking Group vs. Sprite, when Sprite will always be the first parameter.
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
-    return function (bott, bullet) {
-        bot.damage(weapon.getDamageSize());
+    return function (playerR, bullet) {
+        player.damage(weapon.getDamageSize());
         weapon.explodeBullet(bullet);
         bullet.kill();
     };

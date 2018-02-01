@@ -46,8 +46,6 @@ class Player{
 
         this.player.body.setSize(10, 14, 2, 1);
 
-        this.game.camera.follow(this.player);
-
         //  Tell the Weapon to track the 'player' Sprite, offset by 14px horizontally, 0 vertically
         this.weapon.getBody().trackSprite(this.player, 9, 9);
 
@@ -63,7 +61,9 @@ class Player{
             weapon3:false,
             weapon4:false,
             weapon5:false,
-            weaponQ:false
+            weaponQ:false,
+            x:0,
+            y:0
         };
 
         this.input = {
@@ -90,6 +90,13 @@ class Player{
         this.input.right = this.cursors.right.isDown;
         this.input.up = this.cursors.up.isDown;
         this.input.down = this.cursors.down.isDown;
+        this.input.fire = this.fireButton.isDown;
+        this.input.weapon1 = this.weaponSelector[1].isDown;
+        this.input.weapon2 = this.weaponSelector[2].isDown;
+        this.input.weapon3 = this.weaponSelector[3].isDown;
+        this.input.weapon4 = this.weaponSelector[4].isDown;
+        this.input.weapon5 = this.weaponSelector[5].isDown;
+        this.input.weaponQ = this.weaponSelector[0].isDown;
         // this.player.input.fire = this.game.input.activePointer.isDown;
         // this.input.tx = this.game.input.x+ this.game.camera.x;
         // this.input.ty = this.game.input.y+ this.game.camera.y;
@@ -100,15 +107,18 @@ class Player{
             this.cursor.up != this.input.up ||
             this.cursor.down != this.input.down ||
             this.cursor.fire != this.input.fire ||
-            this.cursor.right != this.input.right ||
-            this.cursor.up != this.input.up ||
-            this.cursor.down != this.input.down
+            this.cursor.weapon1 != this.input.weapon1 ||
+            this.cursor.weapon2 != this.input.weapon2 ||
+            this.cursor.weapon3 != this.input.weapon3 ||
+            this.cursor.weapon4 != this.input.weapon4 ||
+            this.cursor.weapon5 != this.input.weapon5 ||
+            this.cursor.weaponQ != this.input.weaponQ
         );
         if (inputChanged)
         {
             //Handle input change here
             //send new values to the server
-            if (this.id == myId)
+            if (this.id === myId)
             {
                 // send latest valid state to the server
                 this.input.x = this.player.x;
@@ -121,33 +131,33 @@ class Player{
             weapon.updateBulletCounter();
         }, this);
 
-        if (this.fireButton.isDown)
+        if (this.cursor.fire)
         {
             this.weapon.getBody().fire();
             this.weaponArr[0].reload();
         }
 
-        if(this.weaponSelector[0].isDown){
+        if(this.cursor.weaponQ){
             this.numCurWeapon = 0;
             this.setWeapon(this.weaponArr[0], this.numCurWeapon);
         }
-        else if(this.weaponSelector[1].isDown){
+        else if(this.cursor.weapon1){
             this.numCurWeapon = 1;
             this.setWeapon(this.weaponArr[1], this.numCurWeapon);
         }
-        else if(this.weaponSelector[2].isDown){
+        else if(this.cursor.weapon2){
             this.numCurWeapon = 2;
             this.setWeapon(this.weaponArr[2], this.numCurWeapon);
         }
-        else if(this.weaponSelector[3].isDown){
+        else if(this.cursor.weapon3){
             this.numCurWeapon = 3;
             this.setWeapon(this.weaponArr[3], this.numCurWeapon);
         }
-        else if(this.weaponSelector[4].isDown){
+        else if(this.cursor.weapon4){
             this.numCurWeapon = 4;
             this.setWeapon(this.weaponArr[4], this.numCurWeapon);
         }
-        else if(this.weaponSelector[5].isDown){
+        else if(this.cursor.weapon5){
             this.numCurWeapon = 5;
             this.setWeapon(this.weaponArr[5], this.numCurWeapon);
         }
@@ -204,7 +214,7 @@ class Player{
     }
 
     setWeapon(weapon, nextNumOfWeapon){
-        var fireAngle = this.weapon.getBody().fireAngle;
+        let fireAngle = this.weapon.getBody().fireAngle;
         this.weapon = weapon;
         this.weapon.getBody().fireAngle = fireAngle;
         this.weapon.getBody().trackSprite(this.player, 9, 9);
@@ -238,6 +248,13 @@ class Player{
 
     reloadWeapon(){
 
+    }
+
+    damage(damage){
+        this.health = this.health - damage;
+        if(this.health <= 0){
+            this.kill();
+        }
     }
 
     kill(){
