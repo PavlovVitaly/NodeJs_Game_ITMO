@@ -7,7 +7,7 @@ var eurecaServer;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });
+    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
@@ -28,7 +28,6 @@ var eurecaClientSetup = function() {
     {
         if (playerList[id]) {
             playerList[id].kill();
-            playerList[id] = null;
             console.log('killing ', id, playerList[id]);
         }
     };
@@ -38,7 +37,7 @@ var eurecaClientSetup = function() {
         if (i === myId) return; //this is me
 
         console.log('SPAWN');
-        var player = new Player(i, 'player', game, Phaser, eurecaServer);
+        var player = new Player(i, {X: x, Y: y}, 'player', game, Phaser, eurecaServer);
         idList.push(i);
         playerList[i] = player;
     };
@@ -51,7 +50,14 @@ var eurecaClientSetup = function() {
             playerList[id].player.y = state.y;
             playerList[id].update();
         }
-    }
+    };
+
+    eurecaClient.exports.makeDamage = function(id, damage)
+    {
+        if (playerList[id])  {
+            playerList[id].damage(damage);
+        }
+    };
 };
 
 
@@ -94,7 +100,7 @@ function create() {
 
     //  Un-comment this on to see the collision tiles
     // layer.debug = true;
-    player = new Player(myId, 'player', game, Phaser, eurecaServer);
+    player = new Player(myId, {X: Math.random()*100, Y: Math.random()*10}, 'player', game, Phaser, eurecaServer);
     playerList[myId] = player;
     game.camera.follow(player.player);
     // bot = new Bot('bot', game, Phaser);
@@ -121,8 +127,11 @@ function update() {
         game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
         // if(player !== playerList[i])
         //     game.physics.arcade.collide(player.getBody(), playerList[i].getBody());
-        playerList[i].getWeapons().forEach(function(weapon, i, arr){
-            // game.physics.arcade.overlap(weapon.getBody().bullets, bot.getBody(), hitBot(weapon, bot));
+        playerList[i].getWeapons().forEach(function(weapon, ind, arr){
+            for(var j in playerList){
+                if(!playerList[j] || j === i) continue;
+                game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(weapon, playerList[j]));
+            }
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
         }, this);
         playerList[i].update();
@@ -136,11 +145,13 @@ function render() {
 
 
 //This is the function that is called when the bullet hits the bot
-function hitEnemy(weapon, player) {
+function hitEnemy(weapon, enemy) {
     /* FUUUUUUUUUUUCK!!!!! >_< If you are checking Group vs. Sprite, when Sprite will always be the first parameter.
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
     return function (playerR, bullet) {
-        player.damage(weapon.getDamageSize());
+        if(player.id === enemy.id) {
+            eurecaServer.damage(enemy.id, weapon.getDamageSize());
+        }
         weapon.explodeBullet(bullet);
         bullet.kill();
     };

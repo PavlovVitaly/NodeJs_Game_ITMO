@@ -1,5 +1,5 @@
 class Player{
-    constructor(id, spriteName, game, phaser, server){
+    constructor(id, spawnLocation, spriteName, game, phaser, server){
         this.id = id;
         this.spriteName = spriteName;
         this.game = game;
@@ -34,7 +34,7 @@ class Player{
         ];
         this.fireButton = this.game.input.keyboard.addKey(this.phaser.KeyCode.SPACEBAR);
 
-        this.player = this.game.add.sprite(Math.random()*100, Math.random()*100, this.spriteName, 1);//48,48
+        this.player = this.game.add.sprite(spawnLocation.X, spawnLocation.Y, this.spriteName, 1);//48,48
         this.health = 100;
 
         this.player.animations.add('left', [8,9], 10, true);
@@ -84,6 +84,7 @@ class Player{
     }
 
     update(){
+        if(this.health <= 0) return;
         this.player.body.velocity.set(0);
 
         this.input.left = this.cursors.left.isDown;
