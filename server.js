@@ -10,7 +10,7 @@ app.use(express.static(__dirname));
 var EurecaServer = require('eureca.io');
 
 //create an instance of EurecaServer
-var eurecaServer = new EurecaServer.Server({allow:['setId', 'spawnEnemy', 'kill', 'updateState', 'makeDamage']});
+var eurecaServer = new EurecaServer.Server({allow:['setId', 'spawnEnemy', 'kill', 'updateState', 'makeDamage', 'updateKillRatio']});
 var clients = {};
 //attach eureca.io to our http server
 eurecaServer.attach(server);
@@ -77,12 +77,21 @@ eurecaServer.exports.handleKeys = function (keys) {
     }
 };
 
-eurecaServer.exports.damage = function(playerId, damage)
+eurecaServer.exports.damage = function(playerId, enemyId, damage)
 {
     for (var c in clients)
     {
         var remote = clients[c].remote;
-        remote.makeDamage(playerId, damage);
+        remote.makeDamage(playerId, enemyId, damage);
+    }
+};
+
+eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
+{
+    for (var c in clients)
+    {
+        var remote = clients[c].remote;
+        
     }
 };
 

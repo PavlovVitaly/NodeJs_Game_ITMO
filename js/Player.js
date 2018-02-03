@@ -36,6 +36,8 @@ class Player{
 
         this.player = this.game.add.sprite(spawnLocation.X, spawnLocation.Y, this.spriteName, 1);//48,48
         this.health = 100;
+        this.numFrags = 0;
+        this.numDeaths = 0;
 
         this.player.animations.add('left', [8,9], 10, true);
         this.player.animations.add('right', [1,2], 10, true);
@@ -251,7 +253,7 @@ class Player{
 
     }
 
-    damage(damage){
+    damage(shooter, damage){
         this.health = this.health - damage;
         if(this.health <= 0){
             this.kill();

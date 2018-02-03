@@ -54,10 +54,10 @@ var eurecaClientSetup = function() {
         }
     };
 
-    eurecaClient.exports.makeDamage = function(id, damage)
+    eurecaClient.exports.makeDamage = function(playerId, enemyId, damage)
     {
-        if (playerList[id])  {
-            playerList[id].damage(damage);
+        if (playerList[enemyId])  {
+            playerList[enemyId].damage(playerId, damage);
         }
     };
 };
@@ -132,7 +132,7 @@ function update() {
         playerList[i].getWeapons().forEach(function(weapon, ind, arr){
             for(var j in playerList){
                 if(!playerList[j] || j === i) continue;
-                game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(weapon, playerList[j]));
+                game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(playerList[i], playerList[j], weapon));
             }
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
         }, this);
@@ -147,12 +147,12 @@ function render() {
 
 
 //This is the function that is called when the bullet hits the bot
-function hitEnemy(weapon, enemy) {
+function hitEnemy(playerWhoShoot, enemy, weapon) {
     /* FUUUUUUUUUUUCK!!!!! >_< If you are checking Group vs. Sprite, when Sprite will always be the first parameter.
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
     return function (playerR, bullet) {
         if(player.id === enemy.id) {
-            eurecaServer.damage(enemy.id, weapon.getDamageSize());
+            eurecaServer.damage(playerWhoShoot.id, enemy.id, weapon.getDamageSize());
         }
         weapon.explodeBullet(bullet);
         bullet.kill();
