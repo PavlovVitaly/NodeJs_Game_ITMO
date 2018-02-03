@@ -23,10 +23,11 @@ eurecaServer.onConnect(function (conn) {
     var remote = eurecaServer.getClient(conn.id);
 
     //register the client
-    clients[conn.id] = {id:conn.id, laststate: null, remote:remote}
-
+    clients[conn.id] = {id:conn.id, laststate: null, remote:remote, spawnLocation: {X: 0, Y: 0}}
+    clients[conn.id].spawnLocation.X = Math.random()*800;
+    clients[conn.id].spawnLocation.Y = Math.random()*800;
     //here we call setId (defined in the client side)
-    remote.setId(conn.id);
+    remote.setId(conn.id, clients[conn.id].spawnLocation);
 });
 
 //detect client disconnection
@@ -54,12 +55,11 @@ eurecaServer.exports.handshake = function()
         for (var cc in clients)
         {
             //send latest known position
-            // var x = clients[cc].laststate ? clients[cc].laststate.x:  0;
-            // var y = clients[cc].laststate ? clients[cc].laststate.y:  0;
-            var x = Math.random()*100;
-            var y = Math.random()*100;
-
-            remote.spawnEnemy(clients[cc].id, x, y);
+            if(!clients[cc].laststate) {
+                remote.spawnEnemy(clients[cc].id, clients[cc].spawnLocation.X, clients[cc].spawnLocation.Y);
+            }else{
+                remote.spawnEnemy(clients[cc].id, clients[cc].laststate.x, clients[cc].laststate.y);
+            }
         }
     }
 };

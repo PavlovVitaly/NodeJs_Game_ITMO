@@ -7,19 +7,22 @@ var eurecaServer;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
+    var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
     });
 
     //methods defined under "exports" namespace become available in the server side
-    eurecaClient.exports.setId = function(id)
+    eurecaClient.exports.setId = function(id, playerLocation)
     {
         //create() is moved here to make sure nothing is created before uniq id assignation
         myId = id;
         idList.push(myId);
         create();
+        player = new Player(myId, playerLocation, 'player', game, Phaser, eurecaServer);
+        playerList[myId] = player;
+        game.camera.follow(player.player);
         eurecaServer.handshake();
         ready = true;
     };
@@ -34,11 +37,10 @@ var eurecaClientSetup = function() {
 
     eurecaClient.exports.spawnEnemy = function(i, x, y)
     {
-        if (i === myId) return; //this is me
+        if (i === myId || playerList[i]) return; //this is me
 
         console.log('SPAWN');
         var player = new Player(i, {X: x, Y: y}, 'player', game, Phaser, eurecaServer);
-        idList.push(i);
         playerList[i] = player;
     };
 
@@ -67,7 +69,7 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.image('Saw', 'assets/sprites/saw1.png');
     game.load.image('Bomb', 'assets/sprites/bullet.png');
@@ -100,9 +102,9 @@ function create() {
 
     //  Un-comment this on to see the collision tiles
     // layer.debug = true;
-    player = new Player(myId, {X: Math.random()*100, Y: Math.random()*10}, 'player', game, Phaser, eurecaServer);
-    playerList[myId] = player;
-    game.camera.follow(player.player);
+    // player = new Player(myId, {X: Math.random()*100, Y: Math.random()*10}, 'player', game, Phaser, eurecaServer);
+    // playerList[myId] = player;
+    // game.camera.follow(player.player);
     // bot = new Bot('bot', game, Phaser);
 
     // help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
