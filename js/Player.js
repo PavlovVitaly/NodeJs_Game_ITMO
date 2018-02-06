@@ -266,4 +266,49 @@ class Player{
     kill(){
         this.player.kill();
     }
+
+    respawn(location){
+        this.player = this.game.add.sprite(location.X, location.Y, this.spriteName, 1);
+        this.weapon = this.weaponArr[1];
+        this.numCurWeapon = 1;
+        this.weapon.getBody().trackSprite(this.player, 9, 9);
+
+        this.weaponArr.forEach(function(weapon, ind, arr){
+            weapon.reload();
+        });
+
+        this.cursor = {
+            left:false,
+            right:false,
+            up:false,
+            down:false,
+            fire:false,
+            weapon1:false,
+            weapon2:false,
+            weapon3:false,
+            weapon4:false,
+            weapon5:false,
+            weaponQ:false,
+            x:0,
+            y:0
+        };
+
+        this.input = {
+            left:false,
+            right:false,
+            up:false,
+            down:false,
+            fire:false,
+            weapon1:false,
+            weapon2:false,
+            weapon3:false,
+            weapon4:false,
+            weapon5:false,
+            weaponQ:false,
+            x:0,
+            y:0
+        };
+
+        this.health = 100;
+    }
 }

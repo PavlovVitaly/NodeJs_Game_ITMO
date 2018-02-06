@@ -56,7 +56,6 @@ var eurecaClientSetup = function() {
 
     eurecaClient.exports.makeDamage = function(playerId, enemyId, damage)
     {
-        console.log('\nmakeDarId: ' + playerId + '\nenemyId: ' + enemyId);
         if (playerList[enemyId])  {
             playerList[enemyId].damage(playerId, damage, player.id);
         }
@@ -66,6 +65,11 @@ var eurecaClientSetup = function() {
         playerList[playerId].numFrags++;
         playerList[enemyId].numDeaths++;
     }
+
+    eurecaClient.exports.respawn = function(playerId, location){
+        playerList[playerId].respawn(location);
+        console.log('respawn: ' + playerId)
+    };
 };
 
 
