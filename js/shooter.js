@@ -56,10 +56,16 @@ var eurecaClientSetup = function() {
 
     eurecaClient.exports.makeDamage = function(playerId, enemyId, damage)
     {
+        console.log('\nmakeDarId: ' + playerId + '\nenemyId: ' + enemyId);
         if (playerList[enemyId])  {
-            playerList[enemyId].damage(playerId, damage);
+            playerList[enemyId].damage(playerId, damage, player.id);
         }
     };
+
+    eurecaClient.exports.updatePlayersKD = function(playerId, enemyId){
+        playerList[playerId].numFrags++;
+        playerList[enemyId].numDeaths++;
+    }
 };
 
 
@@ -69,7 +75,7 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
     game.load.image('Saw', 'assets/sprites/saw1.png');
     game.load.image('Bomb', 'assets/sprites/bullet.png');
@@ -116,7 +122,7 @@ function create() {
 function update() {
     //do not update if client not ready
     if (!ready) return;
-    help.text = 'Health: ' + player.getHealth() + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
+    help.text = 'Health: ' + player.getHealth() + '\nFrags: ' + player.numFrags + '\nDeaths: ' + player.numDeaths + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
 
     // game.physics.arcade.collide(bot.getBody(), layer);
     // game.physics.arcade.collide(player.getBody(), bot.getBody());

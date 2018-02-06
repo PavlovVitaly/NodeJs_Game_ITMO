@@ -253,10 +253,13 @@ class Player{
 
     }
 
-    damage(shooter, damage){
+    damage(shooter, damage, mainPlayerId){
         this.health = this.health - damage;
         if(this.health <= 0){
             this.kill();
+            if(this.id === mainPlayerId) {
+                this.server.updateKillRatio(shooter, this.id);
+            }
         }
     }
 
