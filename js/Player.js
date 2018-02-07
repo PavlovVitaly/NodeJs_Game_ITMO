@@ -86,7 +86,7 @@ class Player{
     }
 
     update(){
-        if(this.health <= 0) return;
+        if(this.health <= 0 || !this.player.body) return;
         this.player.body.velocity.set(0);
 
         this.input.left = this.cursors.left.isDown;
@@ -268,7 +268,7 @@ class Player{
     }
 
     respawn(location){
-        this.player = this.game.add.sprite(location.X, location.Y, this.spriteName, 1);
+        this.player.reset(location.X, location.Y)
         this.weapon = this.weaponArr[1];
         this.numCurWeapon = 1;
         this.weapon.getBody().trackSprite(this.player, 9, 9);

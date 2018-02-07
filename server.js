@@ -93,8 +93,15 @@ eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
     {
         let remote = clients[c].remote;
         remote.updatePlayersKD(playerId, enemyId);
-        // setTimeout(function(){return remote.respawn(enemyId, spawnLocation)}, 2000);
     }
+    setTimeout(function(){
+        for (var c in clients)
+        {
+            console.log("respawn");
+            var remote = clients[c].remote;
+            remote.respawn(enemyId, spawnLocation);
+        }
+    }, 2000);
 };
 
 server.listen(8000);
