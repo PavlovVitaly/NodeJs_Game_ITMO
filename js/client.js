@@ -4,6 +4,8 @@ var idList = [];
 var player;
 var ready = false;
 var eurecaServer;
+var fogOfWar;
+
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
@@ -24,6 +26,7 @@ var eurecaClientSetup = function() {
         player = new Player(myId, playerLocation, 'player', game, Phaser, eurecaServer);
         playerList[myId] = player;
         game.camera.follow(player.player);
+        fogOfWar = new FogOfWarr(player, game, Phaser);
         eurecaServer.handshake();
         ready = true;
     };
@@ -75,6 +78,7 @@ var eurecaClientSetup = function() {
 
 
 
+
 var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });
 
 function preload() {
@@ -111,14 +115,6 @@ function create() {
     //  This isn't totally accurate, but it'll do for now
     map.setCollisionBetween(54, 83);
 
-    //  Un-comment this on to see the collision tiles
-    // layer.debug = true;
-    // player = new Player(myId, {X: Math.random()*100, Y: Math.random()*10}, 'player', game, Phaser, eurecaServer);
-    // playerList[myId] = player;
-    // game.camera.follow(player.player);
-    // bot = new Bot('bot', game, Phaser);
-
-    // help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot\nHealth: ' + bot.health, { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
     help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
     help.inputEnabled = true;
     help.fixedToCamera = true;
@@ -129,13 +125,19 @@ function update() {
     if (!ready) return;
     help.text = 'Health: ' + player.getHealth() + '\nFrags: ' + player.numFrags + '\nDeaths: ' + player.numDeaths + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
 
-    // game.physics.arcade.collide(bot.getBody(), layer);
-    // game.physics.arcade.collide(player.getBody(), bot.getBody());
-    // bot.update();
+    fogOfWar.update();
 
     for (var i in playerList)
     {
         if (!playerList[i]) continue;
+        if(i !== player.id){
+            if(fogOfWar.isInFog(playerList[i].getBody().x, playerList[i].getBody().y)){
+                playerList[i].getBody().visible = false;
+            }
+            else{
+                playerList[i].getBody().visible = true;
+            }
+        }
         game.physics.arcade.collide(playerList[i].getBody(), layer);
         game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
         // if(player !== playerList[i])
@@ -144,6 +146,14 @@ function update() {
             for(var j in playerList){
                 if(!playerList[j] || j === i) continue;
                 game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(playerList[i], playerList[j], weapon));
+
+                // if(fogOfWar.isInFog(weapon.getBody().bullets.x, weapon.getBody().bullets.y)){
+                //     weapon.getBody().bullets.visible = false;
+                // }
+                // else{
+                //     weapon.getBody().bullets.visible = true;
+                // }
+
             }
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
         }, this);
@@ -177,3 +187,5 @@ function hitWall(weapon)
         bullet.kill();
     }
 }
+
+
