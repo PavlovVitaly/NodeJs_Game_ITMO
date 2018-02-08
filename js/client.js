@@ -79,7 +79,6 @@ var eurecaClientSetup = function() {
         aContainers.forEach(function(container, i, arr){
             ammoContainers.push(new AmmoContainer(container.ammoName, container.ammoName + 'Container', container.location, game, Phaser, container.health));
         }, this);
-        console.log('Container is created server');
     };
 };
 
