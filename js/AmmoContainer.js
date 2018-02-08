@@ -5,6 +5,7 @@ class AmmoContainer{
         this.location = location;
         this.game = game;
         this.phaser = phaser;
+        this.defaultHealth = health;
         this.health = health;
         this.container = this.game.add.sprite(location.X, location.Y, this.spriteName, 1);
         console.log('Container is created');
@@ -23,6 +24,6 @@ class AmmoContainer{
 
     respawn(location){
         this.container.reset(location.X, location.Y);
-        this.health = 30;
+        this.health = this.defaultHealth;
     }
 }
