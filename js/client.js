@@ -10,8 +10,8 @@ var fogOfWar;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
-    // var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
+    // var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
+    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
@@ -91,17 +91,26 @@ var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS,
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
-    game.load.spritesheet('player', 'assets/sprites/spaceman1.png', 16, 16);
-    game.load.spritesheet('bot', 'assets/sprites/spaceman1.png', 16, 16);
-    game.load.image('Saw', 'assets/sprites/saw1.png');
-    game.load.image('Bomb', 'assets/sprites/bullet.png');
-    game.load.image('Bullet', 'assets/sprites/bubble.png');
-    game.load.image('Rocket', 'assets/sprites/shmup-bullet.png');
-    game.load.image('Plazma', 'assets/sprites/plazma.png');
-    game.load.image('Flame-Thrower', 'assets/sprites/fire.png');
-    game.load.spritesheet('rocket_kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
-    game.load.spritesheet('bomb_kaboom', 'assets/sprites/explode.png', 128, 128);
-    game.load.image('BombContainer', 'assets/sprites/BombContainer.png');
+
+    game.load.spritesheet('player', 'assets/sprites/Players/spaceman1.png', 16, 16);
+    game.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', 16, 16);
+
+    game.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
+    game.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
+    game.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
+    game.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
+    game.load.image('Plazma', 'assets/sprites/Bullets/Plasma.png');
+    game.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
+
+    game.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', 64, 64, 23);
+    game.load.spritesheet('bomb_kaboom', 'assets/sprites/Explosions/explode.png', 128, 128);
+
+    game.load.image('MedicineContainer', 'assets/sprites/AmmoContainers/MedicineContainer.png');
+    game.load.image('BulletContainer', 'assets/sprites/AmmoContainers/BulletContainer.png');
+    game.load.image('RocketContainer', 'assets/sprites/AmmoContainers/RocketContainer.png');
+    game.load.image('BombContainer', 'assets/sprites/AmmoContainers/BombContainer.png');
+    game.load.image('PlasmaContainer', 'assets/sprites/AmmoContainers/PlasmaContainer.png');
+    game.load.image('Flame-ThrowerContainer', 'assets/sprites/AmmoContainers/Flame-ThrowerContainer.png');
 }
 
 var map;
