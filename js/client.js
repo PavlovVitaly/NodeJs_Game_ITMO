@@ -204,4 +204,10 @@ function hitWall(weapon)
     }
 }
 
+function hitAmmoContainer(){
 
+}
+
+function touchAmmoContainer(){
+
+}
