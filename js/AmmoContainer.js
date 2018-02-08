@@ -7,6 +7,7 @@ class AmmoContainer{
         this.phaser = phaser;
         this.health = health;
         this.container = this.game.add.sprite(location.X, location.Y, this.spriteName, 1);
+        console.log('Container is created');
     }
 
     damage(shooter, damage){

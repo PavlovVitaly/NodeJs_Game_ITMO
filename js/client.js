@@ -1,5 +1,6 @@
 var myId=0;
 var playerList = {};
+var ammoContainers = [];
 var idList = [];
 var player;
 var ready = false;
@@ -9,8 +10,8 @@ var fogOfWar;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    // var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
-    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
+    var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
+    // var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
@@ -21,7 +22,6 @@ var eurecaClientSetup = function() {
     {
         //create() is moved here to make sure nothing is created before uniq id assignation
         myId = id;
-        idList.push(myId);
         create();
         player = new Player(myId, playerLocation, 'player', game, Phaser, eurecaServer);
         playerList[myId] = player;
@@ -68,11 +68,18 @@ var eurecaClientSetup = function() {
     eurecaClient.exports.updatePlayersKD = function(playerId, enemyId){
         playerList[playerId].numFrags++;
         playerList[enemyId].numDeaths++;
-    }
+    };
 
     eurecaClient.exports.respawn = function(playerId, location){
         playerList[playerId].respawn(location);
         console.log('respawn: ' + playerId)
+    };
+
+    eurecaClient.exports.spawnAmmoContainers =  function(aContainers){
+        aContainers.forEach(function(container, i, arr){
+            ammoContainers.push(new AmmoContainer(container.ammoName, container.ammoName + 'Container', container.location, game, Phaser, container.health));
+        }, this);
+        console.log('Container is created server');
     };
 };
 
@@ -94,6 +101,7 @@ function preload() {
     game.load.image('Flame-Thrower', 'assets/sprites/fire.png');
     game.load.spritesheet('rocket_kaboom', 'assets/sprites/explosion.png', 64, 64, 23);
     game.load.spritesheet('bomb_kaboom', 'assets/sprites/explode.png', 128, 128);
+    game.load.image('BombContainer', 'assets/sprites/BombContainer.png');
 }
 
 var map;

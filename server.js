@@ -1,3 +1,6 @@
+// import AmmoContainer from 'server_js/AmmoContainer.js';
+var ammoContainers = require("./server_js/AmmoContainer.js");
+
 var express = require('express'),
     app = express(app),
     server = require('http').createServer(app);
@@ -10,7 +13,16 @@ app.use(express.static(__dirname));
 var EurecaServer = require('eureca.io');
 
 //create an instance of EurecaServer
-var eurecaServer = new EurecaServer.Server({allow:['setId', 'spawnEnemy', 'kill', 'updateState', 'makeDamage', 'updatePlayersKD', 'respawn']});
+var eurecaServer = new EurecaServer.Server({allow:[
+    'setId',
+    'spawnEnemy',
+    'kill',
+    'updateState',
+    'makeDamage',
+    'updatePlayersKD',
+    'respawn',
+    'spawnAmmoContainers']});
+
 var clients = {};
 //attach eureca.io to our http server
 eurecaServer.attach(server);
@@ -18,14 +30,13 @@ eurecaServer.attach(server);
 //detect client connection
 eurecaServer.onConnect(function (conn) {
     console.log('New Client id=%s ', conn.id, conn.remoteAddress);
-
     //the getClient method provide a proxy allowing us to call remote client functions
     var remote = eurecaServer.getClient(conn.id);
 
     //register the client
     clients[conn.id] = {id:conn.id, laststate: null, remote:remote, spawnLocation: {X: 0, Y: 0}}
-    clients[conn.id].spawnLocation.X = Math.random()*1000;
-    clients[conn.id].spawnLocation.Y = Math.random()*800;
+    clients[conn.id].spawnLocation.X = Math.random()*2000;
+    clients[conn.id].spawnLocation.Y = Math.random()*1000;
     //here we call setId (defined in the client side)
     remote.setId(conn.id, clients[conn.id].spawnLocation);
 });
@@ -62,6 +73,9 @@ eurecaServer.exports.handshake = function()
             }
         }
     }
+    var conn = this.connection;
+    var updatedClient = clients[conn.id];
+    updatedClient.remote.spawnAmmoContainers(ammoContainers);
 };
 
 eurecaServer.exports.handleKeys = function (keys) {
