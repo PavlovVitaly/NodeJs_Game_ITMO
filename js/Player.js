@@ -34,7 +34,7 @@ class Player{
         ];
         this.fireButton = this.game.input.keyboard.addKey(this.phaser.KeyCode.SPACEBAR);
 
-        this.player = this.game.add.sprite(spawnLocation.X, spawnLocation.Y, this.spriteName, 1);//48,48
+        this.player = this.game.add.sprite(spawnLocation.X, spawnLocation.Y, this.spriteName, 1);
         this.health = 100;
         this.numFrags = 0;
         this.numDeaths = 0;
