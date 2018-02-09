@@ -1,16 +1,15 @@
 class Weapon{
-    constructor(bullet, bulletsLimit, curGame, phaser){
+    constructor(bullet, numBullets, curGame, phaser){
         this.spriteName = bullet.getSprite();
         this.game = curGame;
         this.phaser = phaser;
         this.bullet = bullet;
-        this.bulletsLimit = bulletsLimit;
-        this.numBullets = this.bulletsLimit;
+        this.numBullets = numBullets;
         this.cursors = this.game.input.keyboard.createCursorKeys();
         //  Creates 1 single bullet, using the 'bullet' graphic
         this.weapon = this.game.plugins.add(this.phaser.Weapon);
         this.weapon.createBullets(1000, this.bullet.getSprite());
-        this.weapon.fireLimit = this.bulletsLimit;
+        this.weapon.fireLimit = numBullets;
         this.weapon.bulletKillDistance = bullet.getDistance();
         //  The bullet will be automatically killed when it leaves the world bounds
         this.weapon.bulletKillType = this.bullet.getKillType();
@@ -33,6 +32,10 @@ class Weapon{
         this.numMadeShoots = this.weapon.shots;
     }
 
+    getName(){
+        return this.spriteName;
+    }
+
     getBody(){
         return this.weapon;
     }
@@ -49,7 +52,8 @@ class Weapon{
         return this.numBullets;
     }
 
-    reload(){
-        this.weapon.resetShots(this.bulletsLimit);
+    reload(ammo){
+        this.weapon.resetShots(ammo);
+        this.numBullets = ammo;
     }
 }

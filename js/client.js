@@ -70,16 +70,29 @@ var eurecaClientSetup = function() {
         playerList[enemyId].numDeaths++;
     };
 
-    eurecaClient.exports.respawn = function(playerId, location){
+    eurecaClient.exports.respawnPlayer = function(playerId, location){
         playerList[playerId].respawn(location);
         console.log('respawn: ' + playerId)
     };
 
     eurecaClient.exports.spawnAmmoContainers =  function(aContainers){
         aContainers.forEach(function(container, i, arr){
-            ammoContainers.push(new AmmoContainer(container.ammoName, container.ammoName + 'Container', container.location, game, Phaser, container.health));
+            if(container.health > 0){
+                ammoContainers.push(new AmmoContainer(container.ammoName, container.ammoName + 'Container', container.location, container.numOfAmmo, game, Phaser, container.health));
+            }
         }, this);
     };
+
+    eurecaClient.exports.takeAmmoContainer = function(playerId, containerId){
+        if(playerList[playerId].reloadAmmo(ammoContainers[containerId])){
+            ammoContainers[containerId].kill();
+            eurecaServer.respawnAmmoContainer(containerId);
+        }
+    };
+
+    eurecaClient.exports.respawnAmmoContainer = function(containerId, location){
+        ammoContainers[containerId].respawn(location);
+    }
 };
 
 
@@ -143,23 +156,26 @@ function update() {
 
     fogOfWar.update();
 
-    for (var i in playerList)
+    ammoContainers.forEach(function(container, i, arr){
+        // game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
+        if (checkOverlap(player.getBody(), container.getBody())) {
+            touchAmmoContainer(player, i)();
+        }
+    }, this);
+
+    for (let i in playerList)
     {
         if (!playerList[i]) continue;
         if(i !== player.id){
-            if(fogOfWar.isInFog(playerList[i].getBody().x, playerList[i].getBody().y)){
-                playerList[i].getBody().visible = false;
-            }
-            else{
-                playerList[i].getBody().visible = true;
-            }
+            playerList[i].getBody().visible = !fogOfWar.isInFog(playerList[i].getBody().x, playerList[i].getBody().y);
         }
         game.physics.arcade.collide(playerList[i].getBody(), layer);
         game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
         // if(player !== playerList[i])
         //     game.physics.arcade.collide(player.getBody(), playerList[i].getBody());
+
         playerList[i].getWeapons().forEach(function(weapon, ind, arr){
-            for(var j in playerList){
+            for(let j in playerList){
                 if(!playerList[j] || j === i) continue;
                 game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(playerList[i], playerList[j], weapon));
 
@@ -208,6 +224,18 @@ function hitAmmoContainer(){
 
 }
 
-function touchAmmoContainer(){
+function touchAmmoContainer(player, containerId){
+    return function(playerBody, containerBody){
+        console.log('sdsds');
+        eurecaServer.takeAmmo(player.id, containerId);
+    }
+}
 
+
+
+function checkOverlap(spriteA, spriteB) {
+
+    var boundsA = spriteA.getBounds();
+    var boundsB = spriteB.getBounds();
+    return Phaser.Rectangle.intersects(boundsA, boundsB);
 }

@@ -20,8 +20,11 @@ var eurecaServer = new EurecaServer.Server({allow:[
     'updateState',
     'makeDamage',
     'updatePlayersKD',
-    'respawn',
-    'spawnAmmoContainers']});
+    'respawnPlayer',
+    'spawnAmmoContainers',
+    'takeAmmoContainer',
+    'respawnAmmoContainer'
+]});
 
 var clients = {};
 //attach eureca.io to our http server
@@ -102,20 +105,40 @@ eurecaServer.exports.damage = function(playerId, enemyId, damage)
 
 eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
 {
-    var spawnLocation = {X: Math.random()*1000, Y: Math.random()*800};
+    var spawnLocation = {X: Math.random()*2000, Y: Math.random()*1000};
     for (var c in clients)
     {
         let remote = clients[c].remote;
         remote.updatePlayersKD(playerId, enemyId);
     }
     setTimeout(function(){
-        for (var c in clients)
-        {
-            console.log("respawn");
+        console.log('Respawn Client id=%s ', c);
+        for (var c in clients){
             var remote = clients[c].remote;
-            remote.respawn(enemyId, spawnLocation);
+            remote.respawnPlayer(enemyId, spawnLocation);
         }
     }, 2000);
+};
+
+eurecaServer.exports.takeAmmo = function(playerId, containerId){
+    for (var c in clients)
+    {
+        let remote = clients[c].remote;
+        remote.takeAmmoContainer(playerId, containerId);
+    }
+};
+
+eurecaServer.exports.respawnAmmoContainer = function(containerId){
+    var spawnLocation = {X: Math.random()*2000, Y: Math.random()*1000};
+    ammoContainers[containerId].setLocation(spawnLocation);
+    ammoContainers[containerId].health = 0;
+    setTimeout(function(){
+        console.log('Respawn ammo container');
+        for (var c in clients)        {
+            var remote = clients[c].remote;
+            remote.respawnAmmoContainer(containerId, spawnLocation);
+        }
+    }, 30000);
 };
 
 server.listen(8000);

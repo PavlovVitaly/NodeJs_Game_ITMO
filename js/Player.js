@@ -7,11 +7,11 @@ class Player{
         this.server = server;
         this.weaponArr = [
             new Weapon(new BulletType('Saw', 100, 10, 1, 0, 0, this.phaser.Weapon.KILL_DISTANCE), 1, this.game, this.phaser),
-            new Weapon(new BulletType('Bullet', 300, 200, 5, 500, 0, this.phaser.Weapon.KILL_DISTANCE), 500, this.game, this.phaser),
-            new Weapon(new BulletType('Rocket', 300, 500, 20, 700, 0, this.phaser.Weapon.KILL_DISTANCE, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), 100, this.game, this.phaser),
-            new Weapon(new BulletType('Bomb', 150, 1000, 70, 300, 0, this.phaser.Weapon.KILL_DISTANCE, 90, new Explosion('bomb_kaboom', this.game, this.phaser)), 50, this.game, this.phaser),
-            new Weapon(new BulletType('Plazma', 800, 1000, 50, 1500, 0, this.phaser.Weapon.KILL_DISTANCE, 90), 20, this.game, this.phaser),
-            new Weapon(new BulletType('Flame-Thrower', 100, 20, 5, 200, 10, this.phaser.Weapon.KILL_DISTANCE, 0), 300, this.game, this.phaser)];
+            new Weapon(new BulletType('Bullet', 300, 200, 5, 500, 0, this.phaser.Weapon.KILL_DISTANCE), 20, this.game, this.phaser),
+            new Weapon(new BulletType('Rocket', 300, 500, 20, 700, 0, this.phaser.Weapon.KILL_DISTANCE, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), 1, this.game, this.phaser),
+            new Weapon(new BulletType('Bomb', 150, 1000, 70, 300, 0, this.phaser.Weapon.KILL_DISTANCE, 90, new Explosion('bomb_kaboom', this.game, this.phaser)), 1, this.game, this.phaser),
+            new Weapon(new BulletType('Plazma', 800, 1000, 50, 1500, 0, this.phaser.Weapon.KILL_DISTANCE, 90), 1, this.game, this.phaser),
+            new Weapon(new BulletType('Flame-Thrower', 100, 20, 5, 200, 10, this.phaser.Weapon.KILL_DISTANCE, 0), 1, this.game, this.phaser)];
         this.weapon = this.weaponArr[1];
         this.numCurWeapon = 1;
         this.offsetWeaponSprite = [
@@ -249,8 +249,22 @@ class Player{
         return this.weapon.getNumBullets();
     }
 
-    reloadWeapon(){
-
+    reloadAmmo(container){
+        let res = false;
+        if((container.ammoName === 'Medicine') && (this.health < container.getAmmo())){
+                this.health = container.getAmmo();
+        }
+        else{
+            this.weaponArr.forEach(function(weapon, i, weapons){
+                if(weapon.getName() === container.getName()){
+                    if(weapon.getNumBullets() < container.getAmmo()) {
+                        weapons[i].reload(container.getAmmo());
+                        res = true;
+                    }
+                }
+            }, this)
+        }
+        return res;
     }
 
     damage(shooter, damage, mainPlayerId){
