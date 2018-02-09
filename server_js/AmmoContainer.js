@@ -7,6 +7,10 @@ class AmmoContainer{
         this.defaultHealth = health;
     }
 
+    getName(){
+        return this.ammoName;
+    }
+
     setLocation(location){
         this.location = location;
     }
@@ -17,6 +21,10 @@ class AmmoContainer{
 
     getHealth(){
         return this.health;
+    }
+
+    damage(damage){
+        this.health -= damage;
     }
 };
 

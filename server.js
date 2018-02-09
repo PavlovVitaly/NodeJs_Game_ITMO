@@ -24,7 +24,8 @@ var eurecaServer = new EurecaServer.Server({allow:[
     'spawnAmmoContainers',
     'takeAmmoContainer',
     'respawnAmmoContainer',
-    'respawnExistAmmoContainers'
+    'respawnExistAmmoContainers',
+    'hitAmmoContainer'
 ]});
 
 var clients = {};
@@ -129,12 +130,21 @@ eurecaServer.exports.takeAmmo = function(playerId, containerId){
     }
 };
 
+eurecaServer.exports.hitAmmo = function(playerId, containerId, damage){
+    ammoContainers[containerId].damage(damage);
+    for (var c in clients)
+    {
+        let remote = clients[c].remote;
+        remote.hitAmmoContainer(playerId, containerId, damage);
+    }
+};
+
 eurecaServer.exports.respawnAmmoContainer = function(containerId){
     var spawnLocation = {X: Math.random()*2000, Y: Math.random()*1000};
     ammoContainers[containerId].setLocation(spawnLocation);
     ammoContainers[containerId].health = 0;
     setTimeout(function(){
-        console.log('Respawn ammo container');
+        console.log('Respawn ammo container: ' + ammoContainers[containerId].getName());
         for (var c in clients)        {
             var remote = clients[c].remote;
             ammoContainers[containerId].setDefaultHealth();

@@ -90,6 +90,13 @@ var eurecaClientSetup = function() {
         }
     };
 
+    eurecaClient.exports.hitAmmoContainer = function(playerId, containerId, damage){
+        ammoContainers[containerId].damage(damage);
+        if(ammoContainers[containerId].getHealth() <= 0){
+            eurecaServer.respawnAmmoContainer(containerId);
+        }
+    };
+
     eurecaClient.exports.respawnAmmoContainer = function(containerId, location){
         ammoContainers[containerId].respawn(location);
     };
@@ -166,10 +173,7 @@ function update() {
     fogOfWar.update();
 
     ammoContainers.forEach(function(container, i, arr){
-        // game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
-        if (checkOverlap(player.getBody(), container.getBody())) {
-            touchAmmoContainer(player, i)();
-        }
+        game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
     }, this);
 
     for (let i in playerList)
@@ -196,8 +200,12 @@ function update() {
                 // }
 
             }
+            ammoContainers.forEach(function(container, ind, containers) {
+                game.physics.arcade.overlap(weapon.getBody().bullets, container.getBody(), hitAmmoContainer( playerList[i], ind, weapon));
+            }, this);
             game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
         }, this);
+
         playerList[i].update();
     };
     game.world.wrap(player.getBody(), 16);
@@ -214,7 +222,7 @@ function hitEnemy(playerWhoShoot, enemy, weapon) {
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
     return function (playerR, bullet) {
         if(player.id === enemy.id) {
-            eurecaServer.damage(playerWhoShoot.id, enemy.id, weapon.getDamageSize());
+            eurecaServer.damage(playerWhoShoot.id, enemy.id, weapon);
         }
         weapon.explodeBullet(bullet);
         bullet.kill();
@@ -229,22 +237,18 @@ function hitWall(weapon)
     }
 }
 
-function hitAmmoContainer(){
-
+function hitAmmoContainer(shooter, containerId, weapon){
+    return function(containerBody, bullet){
+        weapon.explodeBullet(bullet);
+        bullet.kill();
+        if(player.id === shooter.id) {
+            eurecaServer.hitAmmo(player.id, containerId, weapon.getDamageSize());
+        }
+    }
 }
 
 function touchAmmoContainer(player, containerId){
     return function(playerBody, containerBody){
-        console.log('sdsds');
         eurecaServer.takeAmmo(player.id, containerId);
     }
-}
-
-
-
-function checkOverlap(spriteA, spriteB) {
-
-    var boundsA = spriteA.getBounds();
-    var boundsB = spriteB.getBounds();
-    return Phaser.Rectangle.intersects(boundsA, boundsB);
 }

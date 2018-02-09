@@ -9,6 +9,7 @@ class AmmoContainer{
         this.defaultHealth = health;
         this.health = health;
         this.container = this.game.add.sprite(location.X, location.Y, this.spriteName, 1);
+        this.game.physics.enable(this.container, this.phaser.Physics.ARCADE);
     }
 
     getBody(){
@@ -23,11 +24,15 @@ class AmmoContainer{
         return this.ammoName;
     }
 
+    getHealth(){
+        return this.health;
+    }
+
     getLocation(){
         return this.location();
     }
 
-    damage(shooter, damage){
+    damage(damage){
         this.health -= damage;
         if(this.health <= 0){
             this.kill();
