@@ -4,10 +4,19 @@ class AmmoContainer{
         this.location = location;
         this.numOfAmmo = numOfAmmo;
         this.health = health;
+        this.defaultHealth = health;
     }
 
     setLocation(location){
         this.location = location;
+    }
+
+    setDefaultHealth(){
+        this.health = this.defaultHealth;
+    }
+
+    getHealth(){
+        return this.health;
     }
 };
 

@@ -92,7 +92,16 @@ var eurecaClientSetup = function() {
 
     eurecaClient.exports.respawnAmmoContainer = function(containerId, location){
         ammoContainers[containerId].respawn(location);
-    }
+    };
+
+    eurecaClient.exports.respawnExistAmmoContainers = function(aContainers){
+        aContainers.forEach(function(container, i, arr){
+            if(container.health > 0){
+                ammoContainers[i].kill();
+                ammoContainers[i].respawn(container.location);
+            }
+        }, this);
+    };
 };
 
 
@@ -111,7 +120,7 @@ function preload() {
     game.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
     game.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
     game.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
-    game.load.image('Plazma', 'assets/sprites/Bullets/Plasma.png');
+    game.load.image('Plasma', 'assets/sprites/Bullets/Plasma.png');
     game.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
 
     game.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', 64, 64, 23);

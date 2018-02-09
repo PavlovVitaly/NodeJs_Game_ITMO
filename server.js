@@ -23,7 +23,8 @@ var eurecaServer = new EurecaServer.Server({allow:[
     'respawnPlayer',
     'spawnAmmoContainers',
     'takeAmmoContainer',
-    'respawnAmmoContainer'
+    'respawnAmmoContainer',
+    'respawnExistAmmoContainers'
 ]});
 
 var clients = {};
@@ -136,9 +137,24 @@ eurecaServer.exports.respawnAmmoContainer = function(containerId){
         console.log('Respawn ammo container');
         for (var c in clients)        {
             var remote = clients[c].remote;
+            ammoContainers[containerId].setDefaultHealth();
             remote.respawnAmmoContainer(containerId, spawnLocation);
         }
     }, 30000);
 };
+
+setInterval(function(){
+    ammoContainers.forEach(function(item, i, containers){
+        if(containers[i].health > 0) {
+            containers[i].setDefaultHealth();
+            containers[i].setLocation({X: Math.random() * 2000, Y: Math.random() * 1000});
+        }
+    }, this);
+    for (let c in clients){
+        let remote = clients[c].remote;
+        remote.respawnExistAmmoContainers(ammoContainers);
+    }
+    console.log('Respawn all ammo containers');
+}, 60000);
 
 server.listen(8000);

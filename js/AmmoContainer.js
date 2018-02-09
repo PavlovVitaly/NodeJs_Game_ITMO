@@ -23,6 +23,10 @@ class AmmoContainer{
         return this.ammoName;
     }
 
+    getLocation(){
+        return this.location();
+    }
+
     damage(shooter, damage){
         this.health -= damage;
         if(this.health <= 0){
@@ -36,7 +40,7 @@ class AmmoContainer{
 
     respawn(location){
         this.location = location;
-        this.container.reset(location.X, location.Y);
         this.health = this.defaultHealth;
+        this.container.reset(location.X, location.Y);
     }
 }

@@ -10,7 +10,7 @@ class Player{
             new Weapon(new BulletType('Bullet', 300, 200, 5, 500, 0, this.phaser.Weapon.KILL_DISTANCE), 20, this.game, this.phaser),
             new Weapon(new BulletType('Rocket', 300, 500, 20, 700, 0, this.phaser.Weapon.KILL_DISTANCE, 0, new Explosion('rocket_kaboom', this.game, this.phaser)), 1, this.game, this.phaser),
             new Weapon(new BulletType('Bomb', 150, 1000, 70, 300, 0, this.phaser.Weapon.KILL_DISTANCE, 90, new Explosion('bomb_kaboom', this.game, this.phaser)), 1, this.game, this.phaser),
-            new Weapon(new BulletType('Plazma', 800, 1000, 50, 1500, 0, this.phaser.Weapon.KILL_DISTANCE, 90), 1, this.game, this.phaser),
+            new Weapon(new BulletType('Plasma', 800, 1000, 50, 1500, 0, this.phaser.Weapon.KILL_DISTANCE, 90), 1, this.game, this.phaser),
             new Weapon(new BulletType('Flame-Thrower', 100, 20, 5, 200, 10, this.phaser.Weapon.KILL_DISTANCE, 0), 1, this.game, this.phaser)];
         this.weapon = this.weaponArr[1];
         this.numCurWeapon = 1;
