@@ -114,7 +114,7 @@ var eurecaClientSetup = function() {
 
 
 
-var game = new Phaser.Game(window.innerWidth, window.innerHeight, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });
+var game = new Phaser.Game(window.innerWidth - 15, window.innerHeight - 15, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });
 
 function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
@@ -160,7 +160,7 @@ function create() {
     //  This isn't totally accurate, but it'll do for now
     map.setCollisionBetween(54, 83);
 
-    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' }); // todo: change bot on player after debug.
+    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' });
     help.inputEnabled = true;
     help.fixedToCamera = true;
 }
@@ -168,9 +168,13 @@ function create() {
 function update() {
     //do not update if client not ready
     if (!ready) return;
-    help.text = 'Health: ' + player.getHealth() + '\nFrags: ' + player.numFrags + '\nDeaths: ' + player.numDeaths + '\nWeapon: ' + player.weapon.bullet.getSprite() +'\nBullets: ' + player.getCurNumBullets();    // todo: delete bot health after debug.
-
     fogOfWar.update();
+
+    help.text = 'Health: ' + player.getHealth() +
+        '\nFrags: ' + player.numFrags +
+        '\nDeaths: ' + player.numDeaths +
+        '\nWeapon: ' + player.weapon.bullet.getSprite() +
+        '\nBullets: ' + player.getCurNumBullets();
 
     ammoContainers.forEach(function(container, i, containers){
         game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
