@@ -10,8 +10,8 @@ var fogOfWar;
 //this function will handle client communication with the server
 var eurecaClientSetup = function() {
     //create an instance of eureca.io client
-    // var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
-    var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
+    var eurecaClient = new Eureca.Client({ uri: 'http://192.168.7.101:8000/' });    // Change on your server ip.
+    // var eurecaClient = new Eureca.Client({ uri: 'http://10.136.20.146:8000/' });    // Change on your server ip.
 
     eurecaClient.ready(function (proxy) {
         eurecaServer = proxy;
@@ -172,8 +172,11 @@ function update() {
 
     fogOfWar.update();
 
-    ammoContainers.forEach(function(container, i, arr){
+    ammoContainers.forEach(function(container, i, containers){
         game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
+        if(container.getHealth() > 0) {
+            containers[i].getBody().visible = !fogOfWar.isInFog(container.getBody().x, container.getBody().y);
+        }
     }, this);
 
     for (let i in playerList)

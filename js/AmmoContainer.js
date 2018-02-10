@@ -40,6 +40,7 @@ class AmmoContainer{
     }
 
     kill(){
+        this.health = 0;
         this.container.kill();
     }
 
