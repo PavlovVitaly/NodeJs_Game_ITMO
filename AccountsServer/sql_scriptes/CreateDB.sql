@@ -6,8 +6,9 @@ USE PlayersDB;
 CREATE TABLE Players
 (
     keyId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    login varchar(40) NOT NULL,
-    password varchar(50) NOT NULL
+    login varchar(40) NOT NULL UNIQUE,
+    userPassword varchar(50) NOT NULL,
+    email varchar(50) DEFAULT NULL
 )   ENGINE = InnoDB 
 DEFAULT CHARACTER SET = utf8;
 
@@ -16,6 +17,7 @@ CREATE TABLE GameMatch
     keyId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     serverName varchar(100) DEFAULT NULL,
     serverAddress varchar(30) NOT NULL,
+    mapName varchar(100) NOT NULL,
     frags INT DEFAULT 0,
     deaths INT DEFAULT 0,
     takedContainers INT DEFAULT 0,
@@ -29,6 +31,3 @@ CREATE TABLE GameMatch
 )   ENGINE = InnoDB 
 DEFAULT CHARACTER SET = utf8;
 
-CREATE PROCEDURE GetPlayerStatistics()
-BEGIN
-END
