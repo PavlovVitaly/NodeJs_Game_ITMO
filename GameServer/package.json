@@ -1,0 +1,25 @@
+{
+  "name": "itmo_nodejs_gameserver",
+  "version": "1.0.0",
+  "description": "Game server on node js.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PavlovVitaly/NodeJs_Game_ITMO.git"
+  },
+  "author": "PavlovVitaly",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PavlovVitaly/NodeJs_Game_ITMO/issues"
+  },
+  "homepage": "https://github.com/PavlovVitaly/NodeJs_Game_ITMO#readme",
+  "dependencies": {
+    "engine.io": "^3.2.0",
+    "eureca.io": "^0.7.1",
+    "express": "^4.16.2"
+  }
+}
