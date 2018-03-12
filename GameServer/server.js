@@ -1,5 +1,6 @@
 // import AmmoContainer from 'server_js/AmmoContainer.js';
 var ammoContainers = require("./server_js/AmmoContainer.js");
+var logger = require("./server_js/libs/logger/logger.js")(module);
 
 var express = require('express'),
     app = express(app),
@@ -34,7 +35,7 @@ eurecaServer.attach(server);
 
 //detect client connection
 eurecaServer.onConnect(function (conn) {
-    console.log('New Client id=%s ', conn.id, conn.remoteAddress);
+    logger.info('New Client id = ' + conn.id, conn.remoteAddress);
     //the getClient method provide a proxy allowing us to call remote client functions
     var remote = eurecaServer.getClient(conn.id);
 
@@ -48,7 +49,7 @@ eurecaServer.onConnect(function (conn) {
 
 //detect client disconnection
 eurecaServer.onDisconnect(function (conn) {
-    console.log('Client disconnected ', conn.id);
+    logger.info('Client disconnected ' + conn.id);
 
     var removeId = clients[conn.id].id;
 
@@ -114,7 +115,7 @@ eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
         remote.updatePlayersKD(playerId, enemyId);
     }
     setTimeout(function(){
-        console.log('Respawn Client id=%s ', c);
+        logger.info('Respawn Client id = ' + c);
         for (var c in clients){
             var remote = clients[c].remote;
             remote.respawnPlayer(enemyId, spawnLocation);
@@ -144,7 +145,7 @@ eurecaServer.exports.respawnAmmoContainer = function(containerId){
     ammoContainers[containerId].setLocation(spawnLocation);
     ammoContainers[containerId].health = 0;
     setTimeout(function(){
-        console.log('Respawn ammo container: ' + ammoContainers[containerId].getName());
+        logger.info('Respawn ammo container: ' + ammoContainers[containerId].getName());
         for (var c in clients)        {
             var remote = clients[c].remote;
             ammoContainers[containerId].setDefaultHealth();
@@ -164,7 +165,7 @@ setInterval(function(){
         let remote = clients[c].remote;
         remote.respawnExistAmmoContainers(ammoContainers);
     }
-    console.log('Respawn all ammo containers');
+    logger.info('Respawn all ammo containers');
 }, 60000);
 
 server.listen(8000);
