@@ -1,0 +1,6 @@
+{
+  "port": 8000,
+  "time_to_respawn_all_ammo_containers": 60000,
+  "time_to_respawn_ammo_container": 30000,
+  "time_to_player_respawn": 3000
+}

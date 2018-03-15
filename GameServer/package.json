@@ -21,6 +21,7 @@
     "engine.io": "^3.2.0",
     "eureca.io": "^0.7.1",
     "express": "^4.16.2",
+    "nconf": "^0.10.0",
     "winston": "^3.0.0-rc2"
   }
 }

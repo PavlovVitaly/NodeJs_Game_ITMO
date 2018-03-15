@@ -120,7 +120,7 @@ function preload() {
     game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
 
-    game.load.spritesheet('player', 'assets/sprites/Players/spaceman1.png', 16, 16);
+    game.load.spritesheet('player', 'assets/sprites/Players/spaceman.png', 16, 16);
     game.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', 16, 16);
 
     game.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
@@ -214,7 +214,7 @@ function update() {
         }, this);
 
         playerList[i].update();
-    };
+    }
     game.world.wrap(player.getBody(), 16);
 }
 
@@ -229,7 +229,7 @@ function hitEnemy(playerWhoShoot, enemy, weapon) {
     * (http://phaser.io/docs/2.4.4/Phaser.Physics.Arcade.html#overlap) */
     return function (playerR, bullet) {
         if(player.id === enemy.id) {
-            eurecaServer.damage(playerWhoShoot.id, enemy.id, weapon);
+            eurecaServer.damage(playerWhoShoot.id, enemy.id, weapon.getDamageSize());
         }
         weapon.explodeBullet(bullet);
         bullet.kill();

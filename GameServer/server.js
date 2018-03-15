@@ -1,6 +1,7 @@
 // import AmmoContainer from 'server_js/AmmoContainer.js';
 var ammoContainers = require("./server_js/AmmoContainer.js");
 var logger = require("./server_js/libs/logger/logger.js")(module);
+var config = require('./config/config');
 
 var express = require('express'),
     app = express(app),
@@ -35,12 +36,12 @@ eurecaServer.attach(server);
 
 //detect client connection
 eurecaServer.onConnect(function (conn) {
-    logger.info('New Client id = ' + conn.id, conn.remoteAddress);
+    logger.debug('New Client id = ' + conn.id, conn.remoteAddress);
     //the getClient method provide a proxy allowing us to call remote client functions
     var remote = eurecaServer.getClient(conn.id);
 
     //register the client
-    clients[conn.id] = {id:conn.id, laststate: null, remote:remote, spawnLocation: {X: 0, Y: 0}}
+    clients[conn.id] = {id:conn.id, laststate: null, remote:remote, spawnLocation: {X: 0, Y: 0}};
     clients[conn.id].spawnLocation.X = Math.random()*2000;
     clients[conn.id].spawnLocation.Y = Math.random()*1000;
     //here we call setId (defined in the client side)
@@ -49,7 +50,7 @@ eurecaServer.onConnect(function (conn) {
 
 //detect client disconnection
 eurecaServer.onDisconnect(function (conn) {
-    logger.info('Client disconnected ' + conn.id);
+    logger.debug('Client disconnected ' + conn.id);
 
     var removeId = clients[conn.id].id;
 
@@ -104,6 +105,7 @@ eurecaServer.exports.damage = function(playerId, enemyId, damage)
         var remote = clients[c].remote;
         remote.makeDamage(playerId, enemyId, damage);
     }
+    logger.debug('Player ' + playerId + ' damsge ' + enemyId + '. Level of damage: ' + damage);
 };
 
 eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
@@ -115,12 +117,12 @@ eurecaServer.exports.updateKillRatio = function(playerId, enemyId)
         remote.updatePlayersKD(playerId, enemyId);
     }
     setTimeout(function(){
-        logger.info('Respawn Client id = ' + c);
+        logger.debug('Respawn Client id = ' + c);
         for (var c in clients){
             var remote = clients[c].remote;
             remote.respawnPlayer(enemyId, spawnLocation);
         }
-    }, 2000);
+    }, config.get("time_to_player_respawn"));
 };
 
 eurecaServer.exports.takeAmmo = function(playerId, containerId){
@@ -145,13 +147,13 @@ eurecaServer.exports.respawnAmmoContainer = function(containerId){
     ammoContainers[containerId].setLocation(spawnLocation);
     ammoContainers[containerId].health = 0;
     setTimeout(function(){
-        logger.info('Respawn ammo container: ' + ammoContainers[containerId].getName());
+        logger.debug('Respawn ammo container: ' + ammoContainers[containerId].getName());
         for (var c in clients)        {
             var remote = clients[c].remote;
             ammoContainers[containerId].setDefaultHealth();
             remote.respawnAmmoContainer(containerId, spawnLocation);
         }
-    }, 30000);
+    }, config.get("time_to_respawn_ammo_container"));
 };
 
 setInterval(function(){
@@ -165,7 +167,7 @@ setInterval(function(){
         let remote = clients[c].remote;
         remote.respawnExistAmmoContainers(ammoContainers);
     }
-    logger.info('Respawn all ammo containers');
-}, 60000);
+    logger.debug('Respawn all ammo containers');
+}, config.get("time_to_respawn_all_ammo_containers"));
 
-server.listen(8000);
+server.listen(config.get("port"));

@@ -15,7 +15,7 @@ function getLogger(module){
             myFormat
         ),
         transports: [
-            new winston.transports.Console({ colorize: true, level: 'info'}),
+            new winston.transports.Console({ colorize: true, level: 'debug'}),
         ]
     });
 }
