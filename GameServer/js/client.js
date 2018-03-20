@@ -111,34 +111,43 @@ var eurecaClientSetup = function() {
     };
 };
 
+var config = {
+    type: Phaser.CANVAS,
+    width: window.innerWidth - 15,
+    height: window.innerHeight - 15,
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
 
 
-
-var game = new Phaser.Game(window.innerWidth - 15, window.innerHeight - 15, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });
+var game = new Phaser.Game(config);     //'gameDiv'
 
 function preload() {
-    game.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
-    game.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
+    this.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
+    this.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
 
-    game.load.spritesheet('player', 'assets/sprites/Players/spaceman.png', 16, 16);
-    game.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', 16, 16);
+    this.load.spritesheet('player', 'assets/sprites/Players/spaceman.png', { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', { frameWidth: 16, frameHeight: 16 });
 
-    game.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
-    game.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
-    game.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
-    game.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
-    game.load.image('Plasma', 'assets/sprites/Bullets/Plasma.png');
-    game.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
+    this.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
+    this.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
+    this.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
+    this.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
+    this.load.image('Plasma', 'assets/sprites/Bullets/Plasma.png');
+    this.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
 
-    game.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', 64, 64, 23);
-    game.load.spritesheet('bomb_kaboom', 'assets/sprites/Explosions/explode.png', 128, 128);
+    this.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', { frameWidth: 128, frameHeight: 128 }, 23);
+    this.load.spritesheet('bomb_kaboom', 'assets/sprites/Explosions/explode.png', { frameWidth: 128, frameHeight: 128 });
 
-    game.load.image('MedicineContainer', 'assets/sprites/AmmoContainers/MedicineContainer.png');
-    game.load.image('BulletContainer', 'assets/sprites/AmmoContainers/BulletContainer.png');
-    game.load.image('RocketContainer', 'assets/sprites/AmmoContainers/RocketContainer.png');
-    game.load.image('BombContainer', 'assets/sprites/AmmoContainers/BombContainer.png');
-    game.load.image('PlasmaContainer', 'assets/sprites/AmmoContainers/PlasmaContainer.png');
-    game.load.image('Flame-ThrowerContainer', 'assets/sprites/AmmoContainers/Flame-ThrowerContainer.png');
+    this.load.image('MedicineContainer', 'assets/sprites/AmmoContainers/MedicineContainer.png');
+    this.load.image('BulletContainer', 'assets/sprites/AmmoContainers/BulletContainer.png');
+    this.load.image('RocketContainer', 'assets/sprites/AmmoContainers/RocketContainer.png');
+    this.load.image('BombContainer', 'assets/sprites/AmmoContainers/BombContainer.png');
+    this.load.image('PlasmaContainer', 'assets/sprites/AmmoContainers/PlasmaContainer.png');
+    this.load.image('Flame-ThrowerContainer', 'assets/sprites/AmmoContainers/Flame-ThrowerContainer.png');
 }
 
 var map;
@@ -147,7 +156,7 @@ var bot;
 var help;
 
 function create() {
-    game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.physics.startSystem(Phaser.Physics.ARCADE);
 
     //  Because we're loading CSV map data we have to specify the tile size here or we can't render it
     map = game.add.tilemap('map', 16, 16);
