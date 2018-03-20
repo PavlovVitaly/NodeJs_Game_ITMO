@@ -112,9 +112,12 @@ var eurecaClientSetup = function() {
 };
 
 var config = {
-    type: Phaser.CANVAS,
+    type: Phaser.WEBGL,
     width: window.innerWidth - 15,
     height: window.innerHeight - 15,
+    backgroundColor: '#2d2d2d',
+    parent: 'gameDiv',
+    pixelArt: true,
     scene: {
         preload: preload,
         create: create,
@@ -122,32 +125,49 @@ var config = {
     }
 };
 
+var config = {
+    type: Phaser.WEBGL,
+    width: window.innerWidth - 15,
+    height: window.innerHeight - 15,
+    backgroundColor: '#2d2d2d',
+    parent: 'gameDiv',
+    pixelArt: true,
+    physics: {
+        default: 'arcade',
+        arcade: { gravity: { y: 0 } }
+    },
+    scene: {
+        preload: preload,
+        create: create,
+        update: update
+    }
+};
 
-var game = new Phaser.Game(config);     //'gameDiv'
+var game = new Phaser.Game(config);
 
 function preload() {
-    this.load.tilemap('map', 'assets/tilemaps/csv/catastrophi_level2.csv', null, Phaser.Tilemap.CSV);
     this.load.image('tiles', 'assets/tilemaps/tiles/catastrophi_tiles_16.png');
+    this.load.tilemapCSV('map', 'assets/tilemaps/csv/catastrophi_level2.csv');
 
     this.load.spritesheet('player', 'assets/sprites/Players/spaceman.png', { frameWidth: 16, frameHeight: 16 });
-    this.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', { frameWidth: 16, frameHeight: 16 });
-
-    this.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
-    this.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
-    this.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
-    this.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
-    this.load.image('Plasma', 'assets/sprites/Bullets/Plasma.png');
-    this.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
-
-    this.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', { frameWidth: 128, frameHeight: 128 }, 23);
-    this.load.spritesheet('bomb_kaboom', 'assets/sprites/Explosions/explode.png', { frameWidth: 128, frameHeight: 128 });
-
-    this.load.image('MedicineContainer', 'assets/sprites/AmmoContainers/MedicineContainer.png');
-    this.load.image('BulletContainer', 'assets/sprites/AmmoContainers/BulletContainer.png');
-    this.load.image('RocketContainer', 'assets/sprites/AmmoContainers/RocketContainer.png');
-    this.load.image('BombContainer', 'assets/sprites/AmmoContainers/BombContainer.png');
-    this.load.image('PlasmaContainer', 'assets/sprites/AmmoContainers/PlasmaContainer.png');
-    this.load.image('Flame-ThrowerContainer', 'assets/sprites/AmmoContainers/Flame-ThrowerContainer.png');
+    // this.load.spritesheet('bot', 'assets/sprites/Players/spaceman1.png', { frameWidth: 16, frameHeight: 16 });
+    //
+    // this.load.image('Saw', 'assets/sprites/Bullets/saw1.png');
+    // this.load.image('Bomb', 'assets/sprites/Bullets/Bomb.png');
+    // this.load.image('Bullet', 'assets/sprites/Bullets/Bullet.png');
+    // this.load.image('Rocket', 'assets/sprites/Bullets/Rocket.png');
+    // this.load.image('Plasma', 'assets/sprites/Bullets/Plasma.png');
+    // this.load.image('Flame-Thrower', 'assets/sprites/Bullets/Flame-Thrower.png');
+    //
+    // this.load.spritesheet('rocket_kaboom', 'assets/sprites/Explosions/explosion.png', { frameWidth: 128, frameHeight: 128 }, 23);
+    // this.load.spritesheet('bomb_kaboom', 'assets/sprites/Explosions/explode.png', { frameWidth: 128, frameHeight: 128 });
+    //
+    // this.load.image('MedicineContainer', 'assets/sprites/AmmoContainers/MedicineContainer.png');
+    // this.load.image('BulletContainer', 'assets/sprites/AmmoContainers/BulletContainer.png');
+    // this.load.image('RocketContainer', 'assets/sprites/AmmoContainers/RocketContainer.png');
+    // this.load.image('BombContainer', 'assets/sprites/AmmoContainers/BombContainer.png');
+    // this.load.image('PlasmaContainer', 'assets/sprites/AmmoContainers/PlasmaContainer.png');
+    // this.load.image('Flame-ThrowerContainer', 'assets/sprites/AmmoContainers/Flame-ThrowerContainer.png');
 }
 
 var map;
@@ -156,75 +176,88 @@ var bot;
 var help;
 
 function create() {
-    this.physics.startSystem(Phaser.Physics.ARCADE);
+    // this.physics.startSystem(Phaser.Physics.ARCADE);
 
-    //  Because we're loading CSV map data we have to specify the tile size here or we can't render it
-    map = game.add.tilemap('map', 16, 16);
-    //  Now add in the tileset
-    map.addTilesetImage('tiles');
-    //  Create our layer
-    layer = map.createLayer(0);
-    //  Resize the world
-    layer.resizeWorld();
+
+    // When loading a CSV map, make sure to specify the tileWidth and tileHeight
+    map = this.make.tilemap({ key: 'map', tileWidth: 16, tileHeight: 16 });
+    var tileset = map.addTilesetImage('tiles');
+    var layer = map.createDynamicLayer(0, tileset, 0, 0); // layer index, tileset, x, y
+    // layer.setScale(2);
+
     //  This isn't totally accurate, but it'll do for now
     map.setCollisionBetween(54, 83);
 
-    help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' });
-    help.inputEnabled = true;
-    help.fixedToCamera = true;
+    player = this.physics.add.sprite(100, 100, 'player', 1);
+        // .setScale(2);
+    player.setSize(10, 10, false);
+    //  Because we're loading CSV map data we have to specify the tile size here or we can't render it
+    // map = game.add.tilemap('map', 16, 16);
+    //  Now add in the tileset
+    // map.addTilesetImage('tiles');
+    //  Create our layer
+    // layer = map.createLayer(0);
+    //  Resize the world
+    // layer.resizeWorld();
+    //  This isn't totally accurate, but it'll do for now
+    // map.setCollisionBetween(54, 83);
+
+    // help = game.add.text(16, 16, 'Arrows to move\nSpace to shoot', { font: '14px Arial', fill: '#ffffff' });
+    // help.inputEnabled = true;
+    // help.fixedToCamera = true;
 }
 
 function update() {
-    //do not update if client not ready
-    if (!ready) return;
-    fogOfWar.update();
-
-    help.text = 'Health: ' + player.getHealth() +
-        '\nFrags: ' + player.numFrags +
-        '\nDeaths: ' + player.numDeaths +
-        '\nWeapon: ' + player.weapon.bullet.getSprite() +
-        '\nBullets: ' + player.getCurNumBullets();
-
-    ammoContainers.forEach(function(container, i, containers){
-        game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
-        if(container.getHealth() > 0) {
-            containers[i].getBody().visible = !fogOfWar.isInFog(container.getBody().x, container.getBody().y);
-        }
-    }, this);
-
-    for (let i in playerList)
-    {
-        if (!playerList[i]) continue;
-        if(i !== player.id){
-            playerList[i].getBody().visible = !fogOfWar.isInFog(playerList[i].getBody().x, playerList[i].getBody().y);
-        }
-        game.physics.arcade.collide(playerList[i].getBody(), layer);
-        game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
-        // if(player !== playerList[i])
-        //     game.physics.arcade.collide(player.getBody(), playerList[i].getBody());
-
-        playerList[i].getWeapons().forEach(function(weapon, ind, arr){
-            for(let j in playerList){
-                if(!playerList[j] || j === i) continue;
-                game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(playerList[i], playerList[j], weapon));
-
-                // if(fogOfWar.isInFog(weapon.getBody().bullets.x, weapon.getBody().bullets.y)){
-                //     weapon.getBody().bullets.visible = false;
-                // }
-                // else{
-                //     weapon.getBody().bullets.visible = true;
-                // }
-
-            }
-            ammoContainers.forEach(function(container, ind, containers) {
-                game.physics.arcade.overlap(weapon.getBody().bullets, container.getBody(), hitAmmoContainer( playerList[i], ind, weapon));
-            }, this);
-            game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
-        }, this);
-
-        playerList[i].update();
-    }
-    game.world.wrap(player.getBody(), 16);
+    // //do not update if client not ready
+    // if (!ready) return;
+    // fogOfWar.update();
+    //
+    // help.text = 'Health: ' + player.getHealth() +
+    //     '\nFrags: ' + player.numFrags +
+    //     '\nDeaths: ' + player.numDeaths +
+    //     '\nWeapon: ' + player.weapon.bullet.getSprite() +
+    //     '\nBullets: ' + player.getCurNumBullets();
+    //
+    // ammoContainers.forEach(function(container, i, containers){
+    //     game.physics.arcade.overlap(player.getBody(), container.getBody(), touchAmmoContainer(player, i));
+    //     if(container.getHealth() > 0) {
+    //         containers[i].getBody().visible = !fogOfWar.isInFog(container.getBody().x, container.getBody().y);
+    //     }
+    // }, this);
+    //
+    // for (let i in playerList)
+    // {
+    //     if (!playerList[i]) continue;
+    //     if(i !== player.id){
+    //         playerList[i].getBody().visible = !fogOfWar.isInFog(playerList[i].getBody().x, playerList[i].getBody().y);
+    //     }
+    //     game.physics.arcade.collide(playerList[i].getBody(), layer);
+    //     game.physics.arcade.collide(playerList[i].getWeapon().getBody(), layer);
+    //     // if(player !== playerList[i])
+    //     //     game.physics.arcade.collide(player.getBody(), playerList[i].getBody());
+    //
+    //     playerList[i].getWeapons().forEach(function(weapon, ind, arr){
+    //         for(let j in playerList){
+    //             if(!playerList[j] || j === i) continue;
+    //             game.physics.arcade.overlap(weapon.getBody().bullets, playerList[j].getBody(), hitEnemy(playerList[i], playerList[j], weapon));
+    //
+    //             // if(fogOfWar.isInFog(weapon.getBody().bullets.x, weapon.getBody().bullets.y)){
+    //             //     weapon.getBody().bullets.visible = false;
+    //             // }
+    //             // else{
+    //             //     weapon.getBody().bullets.visible = true;
+    //             // }
+    //
+    //         }
+    //         ammoContainers.forEach(function(container, ind, containers) {
+    //             game.physics.arcade.overlap(weapon.getBody().bullets, container.getBody(), hitAmmoContainer( playerList[i], ind, weapon));
+    //         }, this);
+    //         game.physics.arcade.collide(weapon.getBody().bullets, layer, hitWall(weapon));
+    //     }, this);
+    //
+    //     playerList[i].update();
+    // }
+    // game.world.wrap(player.getBody(), 16);
 }
 
 function render() {
