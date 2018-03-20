@@ -1,4 +1,4 @@
-class Weapon{
+export default class Weapon{
     constructor(bullet, numBullets, curGame, phaser){
         this.spriteName = bullet.getSprite();
         this.game = curGame;

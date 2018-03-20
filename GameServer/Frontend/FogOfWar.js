@@ -1,4 +1,4 @@
-class FogOfWarr{
+export default class FogOfWarr{
     constructor(player, game, phaser){
         this.game = game;
         this.phaser = phaser;

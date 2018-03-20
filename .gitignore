@@ -31,6 +31,7 @@ bower_components
 
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
+bundle.js
 
 # Dependency directories
 node_modules/
@@ -111,3 +112,4 @@ fabric.properties
 modules.xml
 .idea/misc.xml 
 # *.ipr 
+

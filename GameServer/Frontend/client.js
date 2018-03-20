@@ -1,3 +1,13 @@
+import AmmoContainer from './AmmoContainer.js';
+import FogOfWar from './FogOfWar.js';
+import Explosion from './Explosion.js';
+import Weapon from './Weapon.js';
+import Player from './Player.js';
+import BulletType from './Bullet.js';
+import Phaser from 'phaser';
+// import Eureca from 'eureca.io';
+
+
 var myId=0;
 var playerList = {};
 var ammoContainers = [];
@@ -110,8 +120,6 @@ var eurecaClientSetup = function() {
         }, this);
     };
 };
-
-
 
 
 var game = new Phaser.Game(window.innerWidth - 15, window.innerHeight - 15, Phaser.CANVAS, 'gameDiv', { preload: preload, create: eurecaClientSetup, update: update, render: render });

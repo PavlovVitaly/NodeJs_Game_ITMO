@@ -1,4 +1,4 @@
-class AmmoContainer{
+export default class AmmoContainer{
     constructor(ammoName, spriteName, location, numOfAmmo, game, phaser, health = 30){
         this.ammoName = ammoName;
         this.spriteName = spriteName;

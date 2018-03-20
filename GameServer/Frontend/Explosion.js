@@ -1,4 +1,4 @@
-class Explosion {
+export default class Explosion {
     constructor(spriteName, game, phaser) {
         this.spriteName = spriteName;
         this.game = game;
@@ -18,6 +18,4 @@ class Explosion {
         explosion.reset(bullet.x, bullet.y);
         explosion.play(this.spriteName, 30, false, true);
     }
-
-
 }

@@ -1,4 +1,4 @@
-class Player{
+export default class Player{
     constructor(id, spawnLocation, spriteName, game, phaser, server){
         this.id = id;
         this.spriteName = spriteName;

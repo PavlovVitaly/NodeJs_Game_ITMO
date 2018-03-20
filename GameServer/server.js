@@ -9,7 +9,7 @@ var express = require('express'),
 
 
 // serve static files from the current directory
-app.use(express.static(__dirname));
+app.use(express.static("public"));
 
 //get EurecaServer class
 var EurecaServer = require('eureca.io');
